@@ -1,0 +1,212 @@
+<div class="w-100 container-xl px-3 px-sm-4 px-lg-5 py-4 py-lg-5" *ngIf="opportunity">
+    
+   <nav class="d-flex align-items-center text-sm text-slate-500 mb-4 overflow-x-auto text-nowrap no-scrollbar">
+        <div class="d-flex align-items-center">
+            <a class="text-decoration-none text-slate-500 hover:text-primary-custom transition-colors" href="#">Home</a>
+            <span class="material-symbols-outlined mx-2 text-slate-400" style="font-size: 16px; display: flex; align-items: center;">chevron_right</span>
+            
+            <a class="text-decoration-none text-slate-500 hover:text-primary-custom transition-colors" href="#">{{ opportunity.type }}s</a>
+            <span class="material-symbols-outlined mx-2 text-slate-400" style="font-size: 16px; display: flex; align-items: center;">chevron_right</span>
+            
+            <span class="text-slate-900 fw-medium text-truncate">{{ opportunity.title }}</span>
+        </div>
+    </nav>
+    
+
+    <div class="row g-4 align-items-start">
+        <div class="col-12 col-lg-8 d-flex flex-column gap-4">
+            
+            <div class="bg-surface rounded-xl p-4 p-sm-5 shadow-soft border border-slate-200">
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill bg-primary-light text-primary-custom fw-semibold" style="font-size: 0.75rem;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">school</span> {{ opportunity.type }}
+                    </span>
+                    <span class="d-inline-flex align-items-center gap-1 px-3 py-1 rounded-pill fw-semibold" style="font-size: 0.75rem; background-color: rgba(16, 185, 129, 0.1); color: var(--accent-green);">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">public</span> International
+                    </span>
+                </div>
+                
+                <h1 class="display-6 fw-bold text-slate-900 mb-2 lh-sm">{{ opportunity.title }}</h1>
+                
+                <div class="d-flex align-items-center gap-2 text-slate-600 fw-medium mb-4">
+                    <span class="material-symbols-outlined filled-icon text-slate-400">account_balance</span>
+                    <p class="mb-0">{{ opportunity.organization }}</p>
+                    <span class="mx-1">•</span>
+                    <p class="mb-0 small fw-normal text-slate-500">Updated {{ opportunity.updatedAt }}</p>
+                </div>
+
+                <div class="position-relative w-100 rounded-3 overflow-hidden mb-4 group" style="height: 20rem;">
+                    <img [src]="opportunity.imageUrl" alt="Cover" class="w-100 h-100 object-cover transition-transform group-hover-scale"/>
+                    <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);"></div>
+                    <div class="position-absolute bottom-0 start-0 p-3 text-white d-flex align-items-center gap-2">
+                        <span class="material-symbols-outlined">location_on</span>
+                        <span class="small fw-medium">{{ opportunity.location }}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 border-bottom border-slate-200">
+                    <button class="tab-btn" [class.active]="activeTab === 'description'" (click)="setActiveTab('description')">Description</button>
+                    <button class="tab-btn" [class.active]="activeTab === 'eligibility'" (click)="setActiveTab('eligibility')">Eligibility</button>
+                    <button class="tab-btn" [class.active]="activeTab === 'benefits'" (click)="setActiveTab('benefits')">Benefits</button>
+                </div>
+
+                <div class="mt-4">
+                    <div *ngIf="activeTab === 'description'">
+                        <p class="text-slate-600 lh-lg fs-5 mb-4">{{ opportunity.description }}</p>
+                    </div>
+                    <div *ngIf="activeTab === 'benefits'">
+                        <h3 class="h5 fw-bold text-slate-900 mt-5 mb-3">About the Program</h3>
+                        <p class="text-slate-600 lh-lg mb-4">{{ opportunity.benefits }}</p>
+                    </div>
+                    <div *ngIf="activeTab === 'eligibility'">
+                        <h3 class="h5 fw-bold text-slate-900 mt-5 mb-3">Eligibility Requirements</h3>
+                        <ul class="list-unstyled d-flex flex-column gap-3 mb-4">
+                            <li *ngFor="let item of opportunity.eligibility" class="d-flex align-items-start gap-3">
+                                <span class="material-symbols-outlined text-success mt-1 flex-shrink-0">check_circle</span>
+                                <span class="text-slate-600">{{ item }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-surface rounded-xl p-4 shadow-soft border border-slate-200 d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center overflow-hidden flex-shrink-0" style="width: 4rem; height: 4rem;">
+                    <img [src]="opportunity.logoUrl" alt="Logo" class="w-100 h-100 object-cover"/>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="h5 fw-bold text-slate-900 mb-0">{{ opportunity.organization }}</h3>
+                    <p class="small text-slate-500 mb-0">Voir le profil complet</p>
+                </div>
+            </div>
+        </div>
+
+       <div class="col-12 col-lg-4 d-flex flex-column gap-4">
+            <div class="bg-surface rounded-xl shadow-lg border border-slate-200 p-4 sticky-top" style="top: 6rem; z-index: 1;">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <p class="small fw-medium text-slate-500 mb-1">Application Deadline</p>
+                        <p class="h5 fw-bold text-slate-900 d-flex align-items-center gap-2">
+                            <span class="material-symbols-outlined text-primary-custom">calendar_clock</span>
+                            {{ opportunity.deadline }}
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-link p-2 text-slate-400 rounded-circle hover-bg-primary-light hover-text-primary"><span class="material-symbols-outlined text-reset">bookmark</span></button>
+                        <button class="btn btn-link p-2 text-slate-400 rounded-circle hover-bg-primary-light hover-text-primary"><span class="material-symbols-outlined text-reset">share</span></button>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column gap-3 mb-4">
+                    <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background-color: #f8fafc;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center text-primary-custom" style="width: 2.5rem; height: 2.5rem; background-color: #dbeafe;">
+                            <span class="material-symbols-outlined">payments</span>
+                        </div>
+                        <div>
+                            <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Value</p>
+                            <p class="small fw-bold text-slate-900 mb-0">{{ opportunity.value }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background-color: #f8fafc;">
+                         <div class="rounded-circle d-flex align-items-center justify-content-center text-success" style="width: 2.5rem; height: 2.5rem; background-color: #dcfce7;">
+                            <span class="material-symbols-outlined">schedule</span>
+                        </div>
+                        <div>
+                            <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Duration</p>
+                            <p class="small fw-bold text-slate-900 mb-0">{{ opportunity.duration }}</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background-color: #f8fafc;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center text-warning" style="width: 2.5rem; height: 2.5rem; background-color: #fef9c3;">
+                           <span class="material-symbols-outlined">translate</span>
+                       </div>
+                       <div>
+                           <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Language</p>
+                           <p class="small fw-bold text-slate-900 mb-0">{{ opportunity.language }}</p>
+                       </div>
+                   </div>
+                   </div>
+
+                <button class="btn btn-primary-custom w-100 py-3 rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2 mb-2">
+                    Apply Now
+                    <span class="material-symbols-outlined" style="font-size: 20px;">open_in_new</span>
+                </button>
+                <p class="small text-center text-slate-400 mb-0" style="font-size: 0.75rem;">
+                    You will be redirected to the official university portal.
+                </p>
+            </div>
+            
+            <div>
+                 <h3 class="small fw-bold text-slate-900 text-uppercase mb-3 px-1">Similar Opportunities</h3>
+                 </div>
+        </div>
+    </div>
+
+    <div class="mt-5 border-top border-slate-200 pt-5">
+        <h2 class="h3 fw-bold text-slate-900 mb-4">More from ScholarHub</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            <div class="col">
+                <div class="group bg-surface rounded-xl border border-slate-200 overflow-hidden shadow-sm h-100">
+                    <div class="position-relative overflow-hidden" style="height: 8rem; background-color: #e2e8f0;">
+                        <img alt="Students" class="w-100 h-100 object-cover transition-transform group-hover-scale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQGIiIYiYJrUnTffhyBs8YhtFTiYVwWEzV3VkD_hLUwF-V-Z_Ax8oIUCjdkQZ37A6GIslYMNnizE_cprTemFgn8j0SA_f8EVQPA8YSdRdtIl65Q4nVpuJURPWOof6XuGmAWj9XVrJfnUZmFMqruB5MFY7HbvA0CJI8aO1GHlz8kO2t1P6p0WiGrKIyZUGuySIbbjsjkfdfwVVk8cYBekjkkiS2elzOPedc_VtSQtEkCWg2Eend8VL_eJpw8TrK6vLcf5HY855kGxw"/>
+                        <div class="position-absolute top-0 start-0 m-2 bg-white bg-opacity-90 px-2 py-1 rounded fw-bold text-uppercase text-dark" style="font-size: 10px; backdrop-filter: blur(4px);">Event</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="fw-bold text-slate-900 mb-1 text-truncate fs-6 group-hover-text-primary">International Student Fair</h3>
+                        <p class="small text-slate-500 mb-2" style="font-size: 0.75rem;">London, UK • Nov 12</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="small fw-medium text-slate-500 bg-light px-2 py-1 rounded" style="font-size: 0.75rem;">Free Entry</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="group bg-surface rounded-xl border border-slate-200 overflow-hidden shadow-sm h-100">
+                    <div class="position-relative overflow-hidden" style="height: 8rem; background-color: #e2e8f0;">
+                        <img alt="Conference" class="w-100 h-100 object-cover transition-transform group-hover-scale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQC7MQsZ9q3WRhvR8Mr5Qav3XoIYZjk8An_UOH55XRIHAc6WlzUsH_QCxVAwexPK30FegBL2WgZqFd-aBOyAllERegfxAvv_H1QmkAipz93UGW21yY6TudutMHjibqKuUPEcTy8hkP8fMTQayJS2bminTJeQBdqycR-0BlgvDtzfpJPmH5F8Uh9tKnD2grxw0EnVvUDy_9iiX1CMDDQRa-FiifWVQU_UrgXHel9tpUmrijtdgO5uZ0s2O03bm6ktK1UwYklCuIPxo"/>
+                        <div class="position-absolute top-0 start-0 m-2 bg-white bg-opacity-90 px-2 py-1 rounded fw-bold text-uppercase text-dark" style="font-size: 10px; backdrop-filter: blur(4px);">Training</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="fw-bold text-slate-900 mb-1 text-truncate fs-6 group-hover-text-primary">Data Science Bootcamp</h3>
+                        <p class="small text-slate-500 mb-2" style="font-size: 0.75rem;">Online • Starts Dec 1</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="small fw-medium text-success px-2 py-1 rounded" style="font-size: 0.75rem; background-color: #f0fdf4;">Open</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="group bg-surface rounded-xl border border-slate-200 overflow-hidden shadow-sm h-100">
+                    <div class="position-relative overflow-hidden" style="height: 8rem; background-color: #e2e8f0;">
+                        <img alt="Books" class="w-100 h-100 object-cover transition-transform group-hover-scale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0Q2RLR7_xwQRJxajuitmqEa7ZYurrVsUTJeZB6y6QcapcbuzBXLndnnry3Tc6Fg4b4ICx8FOYurgWMnQyykwOX4jRWXW8CIrvstlSUMV3uvRc1S5a_-bg2lpxoBXVzmMZGDvFYW-1a8Xmhj4KaPYaN3UWLcXkx7Ru65q5eXBQUzRdk3oB5GSNQHPIpMH4trN1lzUnYRxov5a_UthFvvOpC_ZtJxvpUGiX4NlI3tpJ6xCqdfgKmGmU6GaiPuXmQwVlOls42PtCMX0"/>
+                        <div class="position-absolute top-0 start-0 m-2 bg-white bg-opacity-90 px-2 py-1 rounded fw-bold text-uppercase text-dark" style="font-size: 10px; backdrop-filter: blur(4px);">Scholarship</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="fw-bold text-slate-900 mb-1 text-truncate fs-6 group-hover-text-primary">Women in Tech Grant</h3>
+                        <p class="small text-slate-500 mb-2" style="font-size: 0.75rem;">Global • Annual</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="small fw-medium text-primary-custom px-2 py-1 rounded" style="font-size: 0.75rem; background-color: #eff6ff;">$5,000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="group bg-surface rounded-xl border border-slate-200 overflow-hidden shadow-sm h-100">
+                    <div class="position-relative overflow-hidden" style="height: 8rem; background-color: #e2e8f0;">
+                        <img alt="Architecture" class="w-100 h-100 object-cover transition-transform group-hover-scale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1XY49nFFW4D9_bYex5N5cbzifKXqRIFT9JP2Uce2vALmS1fadKIA1BN4ZwEzkSgUXK_Cuxn-tT-ay1oNZblCTnifZBB-wxZNOGZ4dSZLvjmfp8hLD1xGeJd4KDR5Ae_OOieVjki5kn9DeloiDjPN0fQPYrtymd4NQ6XjKh0yARj6SX9pPzMkKYQH9Rq1wRFjkIMtR5TY6WyLrfnkIkMsOxGcSza23QG-jOPBWwwV7Dywt1ppwUmTdGoZxPcvhueL_gvStiqlXFZg"/>
+                        <div class="position-absolute top-0 start-0 m-2 bg-white bg-opacity-90 px-2 py-1 rounded fw-bold text-uppercase text-dark" style="font-size: 10px; backdrop-filter: blur(4px);">Scholarship</div>
+                    </div>
+                    <div class="p-3">
+                        <h3 class="fw-bold text-slate-900 mb-1 text-truncate fs-6 group-hover-text-primary">Future Leaders Award</h3>
+                        <p class="small text-slate-500 mb-2" style="font-size: 0.75rem;">Melbourne, AU • Jan 10</p>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="small fw-medium text-primary-custom px-2 py-1 rounded" style="font-size: 0.75rem; background-color: #eff6ff;">Full Tuition</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
