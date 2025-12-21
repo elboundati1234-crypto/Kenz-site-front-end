@@ -1,15 +1,15 @@
 export interface Opportunity {
   id: number;
   title: string;
-  type: 'Scholarship' | 'Training' | 'Event'; // Pour gérer l'affichage conditionnel
+  type: 'Scholarship' | 'Training' | 'Event';
   organization: string;
   location: string;
   updatedAt: string;
   imageUrl: string;
   logoUrl: string;
   description: string;
-  eligibility: string[]; // Liste des conditions
-  benefits: string;      // Champ spécifique demandé
+  benefits: string;
+  eligibility: string[];
   deadline: string;
   value: string;
   duration: string;
