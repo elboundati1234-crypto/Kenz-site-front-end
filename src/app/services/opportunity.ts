@@ -90,7 +90,7 @@ export class OpportunityService {
       deadline: "Annual",
       value: "$5,000",
       duration: "One-off",
-      language: "English",
+      language: "Francais et Anglais",
       registrationLink: "#"
     },
 
