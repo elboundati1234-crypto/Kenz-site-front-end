@@ -1,0 +1,79 @@
+/* --- BOUTONS --- */
+.btn-primary-custom {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    border: none;
+    font-weight: 700;
+    transition: background-color 0.2s;
+}
+.btn-primary-custom:hover { 
+    background-color: var(--primary-dark) !important; 
+}
+
+/* --- ONGLETS (Tabs) --- */
+.tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-slate-500);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.tab-btn.active {
+    color: var(--primary-color) !important;
+    border-bottom-color: var(--primary-color) !important;
+    font-weight: 700;
+}
+.tab-btn:hover:not(.active) { color: var(--text-slate-900); }
+
+/* --- UTILITAIRES DE STYLE (Local à la page) --- */
+.bg-surface { background-color: var(--surface-light); }
+.bg-primary-light { background-color: rgba(19, 127, 236, 0.1) !important; }
+
+.text-primary-custom { color: var(--primary-color) !important; }
+.text-slate-500 { color: var(--text-slate-500) !important; }
+.text-slate-600 { color: var(--text-slate-600) !important; }
+.text-slate-900 { color: var(--text-slate-900) !important; }
+
+.border-slate-200 { border-color: var(--border-slate-200) !important; }
+
+.rounded-xl { border-radius: 0.75rem !important; }
+.shadow-soft { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+
+.object-cover { object-fit: cover; }
+
+/* --- EFFETS DE SURVOL --- */
+.group:hover .group-hover-scale { transform: scale(1.05); }
+.group:hover .group-hover-text-primary { color: var(--primary-color) !important; }
+
+.transition-transform { transition: transform 0.5s; }
+.transition-colors { transition: color 0.2s, background-color 0.2s, border-color 0.2s; }
+
+/* --- BADGES --- */
+.badge-custom {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+.badge-green {
+    background-color: #dcfce7 !important;
+    color: #166534 !important;
+}
+.badge-blue {
+    background-color: #eff6ff !important;
+    color: #1d4ed8 !important;
+}
+.badge-gray {
+    background-color: #f3f4f6 !important;
+    color: #4b5563 !important;
+}
+
+/* --- SCROLLBAR --- */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
