@@ -85,7 +85,7 @@ export class OpportunityService {
       deadline: "Annual",
       value: "$5,000",
       duration: "1 Year",
-      language: "English",
+      language: "English, French",
       registrationLink: "#"
     },
     {
@@ -104,7 +104,7 @@ export class OpportunityService {
       deadline: "Jan 10, 2025",
       value: "Full Tuition",
       duration: "3 Years",
-      language: "English",
+      language: "English, French, Spanish",
       registrationLink: "#"
     }
   ];

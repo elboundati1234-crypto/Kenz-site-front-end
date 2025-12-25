@@ -3,7 +3,7 @@ export interface Opportunity {
   title: string;
   type: 'Scholarship' | 'Training' | 'Event';
   organization: string;
-  orgDescription: string; // Nouveau champ pour la description dynamique
+  orgDescription: string; 
   location: string;
   updatedAt: string;
   imageUrl: string;
