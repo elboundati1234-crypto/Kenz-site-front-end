@@ -1,12 +1,23 @@
 import { Routes } from '@angular/router';
-import { DetailsPageComponent } from './pages/details-page/details-page';
+
+// Import des composants
+import { ScholarshipsComponent } from './pages/scholarships/scholarships';
+import { ScholarshipDetailsComponent } from './pages/scholarship-details/scholarship-details';
+import { TrainingsComponent } from './pages/trainings/trainings'; // <--- NOUVEL IMPORT
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'details/1', pathMatch: 'full' },
+  // Page d'accueil (Redirige vers la liste des bourses par défaut)
+  { path: '', redirectTo: 'scholarships', pathMatch: 'full' },
   
-  // Route dynamique avec paramètre :id
-  { path: 'details/:id', component: DetailsPageComponent },
+  // Page : Liste des Bourses (Existante)
+  { path: 'scholarships', component: ScholarshipsComponent },
   
-  // Redirection si l'URL n'existe pas
-  { path: '**', redirectTo: 'details/1' }
+  // Page : Liste des Formations (NOUVELLE PAGE)
+  { path: 'trainings', component: TrainingsComponent },
+  
+  // Page de détails dynamique (utilisée pour Bourses et Formations)
+  { path: 'details/:id', component: ScholarshipDetailsComponent },
+  
+  // Redirection de sécurité (404)
+  { path: '**', redirectTo: 'scholarships' }
 ];

@@ -16,4 +16,6 @@ export interface Opportunity {
   duration: string;
   language: string;
   registrationLink: string;
+  level?: string; 
+  tags?: string[];
 }

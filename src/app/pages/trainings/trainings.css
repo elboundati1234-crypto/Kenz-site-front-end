@@ -1,0 +1,12 @@
+/* Style spécifique à la Hero Section */
+.hero-section {
+    min-height: 320px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Hover effects pour les boutons du menu horizontal */
+.hover-bg-light:hover {
+    background-color: #f8f9fa !important;
+}

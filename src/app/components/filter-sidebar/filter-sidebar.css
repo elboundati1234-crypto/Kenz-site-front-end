@@ -1,0 +1,28 @@
+/* --- POSITIONNEMENT --- */
+.sticky-top {
+    top: 90px !important; /* Laisse de la place pour le Header fixe */
+    z-index: 10;
+}
+
+/* --- CHECKBOXES --- */
+.form-check-input {
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-custom);
+    border-color: var(--primary-custom);
+}
+
+.form-check-label {
+    cursor: pointer;
+    color: #495057;
+}
+
+/* --- LIEN RESET --- */
+a.text-primary-custom {
+    cursor: pointer;
+}
+a.text-primary-custom:hover {
+    text-decoration: underline !important;
+}

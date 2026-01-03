@@ -1,0 +1,50 @@
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top py-3 shadow-sm">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
+            <span class="material-symbols-outlined text-primary-custom" style="font-size: 32px;">school</span>
+            <span class="fw-bold fs-4 text-dark">ScholarEvents</span>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-4 mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link text-dark fw-medium" 
+                       routerLink="/" 
+                       routerLinkActive="text-primary-custom fw-bold" 
+                       [routerLinkActiveOptions]="{exact: true}">Home</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link text-dark fw-medium" 
+                       routerLink="/scholarships" 
+                       routerLinkActive="text-primary-custom fw-bold">Scholarships</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link text-dark fw-medium" 
+                       routerLink="/trainings" 
+                       routerLinkActive="text-primary-custom fw-bold">Trainings</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link text-dark fw-medium" 
+                       routerLink="/events" 
+                       routerLinkActive="text-primary-custom fw-bold">Events</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link text-dark fw-medium" href="#">About</a>
+                </li>
+            </ul>
+            
+            <div class="d-flex gap-2 ms-lg-4 mt-3 mt-lg-0">
+                <button class="btn btn-light-custom px-4 rounded-3">Login</button>
+                <button class="btn btn-primary-custom px-4 rounded-3">Sign Up</button>
+            </div>
+        </div>
+    </div>
+</nav>
