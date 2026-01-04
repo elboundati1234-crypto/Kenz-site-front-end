@@ -1,5 +1,6 @@
 <div class="hero-section d-flex align-items-center justify-content-center p-4 text-center text-white" 
-     style='background-image: linear-gradient(rgba(19, 127, 236, 0.9), rgba(16, 25, 34, 0.9)); min-height: 320px;'>
+     style='background-image: linear-gradient(rgba(19, 127, 236, 0.9), rgba(16, 25, 34, 0.9)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBUahCExusFLzbr_FzQGpHCxCkuHSXURYYdh6_3aEV7ZHuBR-ClPM6x6ez69C6cOS1p_CB1e9yLRv2RvvCWL5e_Bl3ydOfGHM4HlCT1ewHrm53RjxBl1-24SsaM8X-sfc9ZcVLDdWttHfOkKh96uzQbnFWUQ1ptSuOlaOLjJogQBBfaYxL9TzBqEaogerkaeNAW7pan0ufjjWAQdmGR7W6SHG6DaGsgRDMXYm7HzUTOwHBBl6_lZDXnAU8tH7EpFhvorV5nCZxRD4-7"); min-height: 320px; background-size: cover; background-position: center;'>
+    
     <div class="d-flex flex-column gap-4 w-100 align-items-center">
         <div style="max-width: 720px;">
             <h1 class="display-4 fw-bold">Find the perfect training</h1>
@@ -35,7 +36,8 @@
         <aside class="col-lg-3 d-none d-lg-block">
             <app-training-filter 
                 (filterChange)="handleFilterChange($event)"
-                (reset)="handleReset()"> </app-training-filter>
+                (reset)="handleReset()">
+            </app-training-filter>
         </aside>
 
         <main class="col-lg-9">
