@@ -1,14 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router'; // Important pour les liens
+import { RouterLink } from '@angular/router';
 import { OpportunityService } from '../../services/opportunity';
 import { Opportunity } from '../../models/opportunity';
 import { Training } from '../../models/training';
 
-// Import des composants enfants
 import { TrainingCardComponent } from '../../components/training-card/training-card';
 import { TrainingFilterComponent } from '../../components/training-filter/training-filter';
+
+// Interface pour les tags visuels
+interface FilterTag {
+  key: string;
+  label: string;
+}
 
 @Component({
   selector: 'app-trainings',
@@ -19,16 +24,20 @@ import { TrainingFilterComponent } from '../../components/training-filter/traini
 })
 export class TrainingsComponent implements OnInit {
   
-  // Données
-  allTrainings: Training[] = [];      // Toutes les données chargées
-  filteredTrainings: Training[] = []; // Données après filtres/recherche
-  paginatedTrainings: Training[] = []; // Données affichées (page actuelle)
+  allTrainings: Training[] = [];
+  filteredTrainings: Training[] = [];
+  paginatedTrainings: Training[] = [];
 
   searchTerm: string = '';
 
-  // Variables Pagination
+  // --- NOUVEAU : Variables pour Tri et Tags ---
+  sortOption: string = 'newest';
+  activeTags: FilterTag[] = [];
+  activeFilters: any = {}; // Stocke l'état actuel des filtres
+  // --------------------------------------------
+
   currentPage: number = 1;
-  itemsPerPage: number = 6; // Max 6 par page
+  itemsPerPage: number = 6;
   totalPages: number = 0;
   pagesArray: number[] = [];
 
@@ -36,46 +45,129 @@ export class TrainingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.opportunityService.getOpportunities().subscribe((data: Opportunity[]) => {
-      // 1. Filtrer pour ne garder que les 'Training'
       const rawData = data.filter(op => op.type === 'Training');
-      
-      // 2. Mapper vers le modèle Training
       this.allTrainings = rawData.map(op => this.mapToTraining(op));
       
-      // 3. Initialiser la liste filtrée avec tout
       this.filteredTrainings = [...this.allTrainings];
       
-      // 4. Calculer la première page
+      // Tri initial
+      this.sortResults();
       this.calculatePagination();
     });
   }
 
-  // --- LOGIQUE PAGINATION ---
+  // --- 1. GESTION DU TRI (SORT BY) ---
+  onSortChange() {
+    this.sortResults();
+    this.currentPage = 1;
+    this.calculatePagination();
+  }
 
+  sortResults() {
+    if (this.sortOption === 'newest') {
+      this.filteredTrainings.sort((a, b) => b.id - a.id);
+    } else if (this.sortOption === 'oldest') {
+      this.filteredTrainings.sort((a, b) => a.id - b.id);
+    }
+  }
+
+  // --- 2. GESTION DES TAGS VISUELS ---
+  updateActiveTags() {
+    this.activeTags = [];
+    const f = this.activeFilters;
+
+    // Mapping manuel : Filtres -> Tags
+    // Adaptez ces clés selon ce que votre <app-training-filter> envoie
+    if (f.price === 'Free') this.activeTags.push({ key: 'price', label: 'Free Only' });
+    if (f.price === 'Paid') this.activeTags.push({ key: 'price', label: 'Paid Only' });
+    
+    if (f.development) this.activeTags.push({ key: 'development', label: 'Development' });
+    if (f.design) this.activeTags.push({ key: 'design', label: 'Design' });
+    if (f.business) this.activeTags.push({ key: 'business', label: 'Business' });
+    if (f.data) this.activeTags.push({ key: 'data', label: 'Data Science' });
+
+    if (f.format === 'Online') this.activeTags.push({ key: 'format', label: 'Online' });
+    if (f.format === 'InPerson') this.activeTags.push({ key: 'format', label: 'In Person' });
+  }
+
+  removeTag(tag: FilterTag) {
+    // Si c'est un bouton radio (Prix/Format), on remet à 'All' ou null
+    if (tag.key === 'price' || tag.key === 'format') {
+        this.activeFilters[tag.key] = 'All'; // ou null selon votre logique
+    } else {
+        // Si c'est une checkbox, on met false
+        this.activeFilters[tag.key] = false;
+    }
+    
+    // On réapplique les filtres
+    this.applyFilters();
+  }
+
+  handleReset() {
+    this.searchTerm = '';
+    this.activeFilters = {}; // Reset total
+    this.applyFilters();
+  }
+
+  // --- 3. LOGIQUE DE FILTRAGE PRINCIPALE ---
+  handleFilterChange(filters: any) {
+    this.activeFilters = filters;
+    this.applyFilters();
+  }
+
+  onSearch() {
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    const f = this.activeFilters;
+
+    this.filteredTrainings = this.allTrainings.filter(t => {
+      // 1. Recherche Texte
+      const matchSearch = t.title.toLowerCase().includes(this.searchTerm.toLowerCase());
+      
+      // 2. Filtres Sidebar (Exemple)
+      let matchPrice = true;
+      if (f.price === 'Free' && t.badgeType !== 'Free') matchPrice = false;
+      if (f.price === 'Paid' && t.badgeType === 'Free') matchPrice = false;
+
+      let matchCategory = true;
+      // Si au moins une catégorie est cochée, on vérifie. Sinon on affiche tout.
+      const catChecked = f.development || f.design || f.business || f.data;
+      if (catChecked) {
+          matchCategory = false; // On part de false et on cherche une correspondance
+          if (f.development && t.category === 'Development') matchCategory = true;
+          if (f.design && t.category === 'Design') matchCategory = true;
+          if (f.business && t.category === 'Business') matchCategory = true;
+          if (f.data && t.category === 'Data Science') matchCategory = true;
+      }
+
+      return matchSearch && matchPrice && matchCategory;
+    });
+
+    // Mise à jour UI
+    this.updateActiveTags();
+    this.sortResults();
+    
+    // Reset Pagination
+    this.currentPage = 1;
+    this.calculatePagination();
+  }
+
+
+  // --- PAGINATION (Inchangé) ---
   calculatePagination() {
     this.totalPages = Math.ceil(this.filteredTrainings.length / this.itemsPerPage);
     this.pagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-    
-    // Si on est sur la page 5 mais qu'il n'y a plus que 2 pages après filtrage
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = 1;
-    }
-    
-    // Cas spécial : si 0 résultats, page 1
-    if (this.totalPages === 0) {
-        this.currentPage = 1;
-    }
-
+    if (this.currentPage > this.totalPages) this.currentPage = 1;
+    if (this.totalPages === 0) this.currentPage = 1;
     this.updatePaginatedList();
   }
 
   updatePaginatedList() {
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
     const endIndex = startIndex + this.itemsPerPage;
-    
     this.paginatedTrainings = this.filteredTrainings.slice(startIndex, endIndex);
-    
-    // Remonter en haut de page lors du changement
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -86,41 +178,9 @@ export class TrainingsComponent implements OnInit {
     }
   }
 
-  // --- LOGIQUE FILTRES & RECHERCHE ---
-
-  handleFilterChange(filters: any) {
-    this.filteredTrainings = this.allTrainings.filter(t => {
-      // Filtre Recherche Texte (gardé ici pour combiner)
-      const matchSearch = t.title.toLowerCase().includes(this.searchTerm.toLowerCase());
-      
-      // Filtre Prix
-      let matchPrice = true;
-      if (filters.price === 'Free') matchPrice = t.badgeType === 'Free';
-      if (filters.price === 'Paid') matchPrice = t.badgeType !== 'Free';
-
-      // Filtre Sujet (Exemple basique, à adapter selon vos checkbox)
-      let matchSubject = true;
-      if (filters.cs && t.category !== 'Development') matchSubject = false;
-      // ... ajoutez d'autres logiques si besoin ...
-
-      return matchSearch && matchPrice && matchSubject;
-    });
-
-    // IMPORTANT : Revenir page 1 après filtre
-    this.currentPage = 1;
-    this.calculatePagination();
-  }
-
-  onSearch() {
-    // On rappelle la logique de filtre avec des filtres par défaut ou actuels
-    // Pour faire simple ici, on refiltre sur le texte
-    this.handleFilterChange({ price: 'All' }); // Ou gardez les filtres actuels en mémoire
-  }
-
-  // --- MAPPING ---
+  // --- MAPPING (Inchangé) ---
   private mapToTraining(op: Opportunity): Training {
     const text = (op.title + ' ' + op.description).toLowerCase();
-    
     let cat = 'General';
     if (text.includes('code') || text.includes('stack') || text.includes('web')) cat = 'Development';
     else if (text.includes('design') || text.includes('ux')) cat = 'Design';
@@ -139,7 +199,7 @@ export class TrainingsComponent implements OnInit {
       organization: op.organization,
       image: op.imageUrl,
       duration: op.duration || 'Self-paced',
-      description: op.description, // Important pour éviter l'erreur TS
+      description: op.description,
       badgeType: badge,
       isCertified: op.benefits?.toLowerCase().includes('certified') || false
     };

@@ -1,12 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { OpportunityService } from '../../services/opportunity'; // Attention au chemin .service
+import { OpportunityService } from '../../services/opportunity';
 import { Opportunity } from '../../models/opportunity';
 import { Scholarship } from '../../models/scholarship';
 
 import { ScholarshipCardComponent } from '../../components/scholarship-card/scholarship-card';
 import { FilterSidebarComponent } from '../../components/filter-sidebar/filter-sidebar';
+
+// Interface pour les étiquettes de filtres (Tags)
+interface FilterTag {
+  key: string;
+  label: string;
+}
 
 @Component({
   selector: 'app-scholarships',
@@ -17,15 +23,19 @@ import { FilterSidebarComponent } from '../../components/filter-sidebar/filter-s
 })
 export class ScholarshipsComponent implements OnInit {
 
-  allScholarships: Scholarship[] = [];     // Données brutes
-  filteredScholarships: Scholarship[] = []; // Données filtrées (Totalité des résultats)
-  paginatedScholarships: Scholarship[] = []; // Données affichées (6 par page)
+  allScholarships: Scholarship[] = [];
+  filteredScholarships: Scholarship[] = [];
+  paginatedScholarships: Scholarship[] = [];
   
   searchTerm: string = '';
   
-  // Variables Pagination
+  // --- NOUVEAU : Tri et Tags ---
+  sortOption: string = 'newest';
+  activeTags: FilterTag[] = [];
+  // -----------------------------
+
   currentPage: number = 1;
-  itemsPerPage: number = 6; // Limite demandée
+  itemsPerPage: number = 6;
   totalPages: number = 0;
   pagesArray: number[] = [];
 
@@ -42,40 +52,60 @@ export class ScholarshipsComponent implements OnInit {
         .filter(op => op.type === 'Scholarship')
         .map(op => this.mapOpportunityToScholarship(op));
       
-      // Initialisation
       this.filteredScholarships = [...this.allScholarships];
-      this.calculatePagination(); // Calculer les pages au démarrage
+      this.sortResults(); // Tri initial
+      this.calculatePagination();
     });
   }
 
-  // --- GESTION PAGINATION ---
-  calculatePagination() {
-    this.totalPages = Math.ceil(this.filteredScholarships.length / this.itemsPerPage);
-    this.pagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
-    
-    // Si on filtre et que la page actuelle n'existe plus (ex: page 5 devient page 1)
-    if (this.currentPage > this.totalPages) {
-      this.currentPage = 1;
-    }
-    
-    this.updatePaginatedList();
+  // --- LOGIQUE DE TRI ---
+  onSortChange() {
+    this.sortResults();
+    this.currentPage = 1; 
+    this.calculatePagination();
   }
 
-  updatePaginatedList() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const endIndex = startIndex + this.itemsPerPage;
-    this.paginatedScholarships = this.filteredScholarships.slice(startIndex, endIndex);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  changePage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.updatePaginatedList();
+  sortResults() {
+    if (this.sortOption === 'newest') {
+      // Tri par ID décroissant (simule le plus récent)
+      this.filteredScholarships.sort((a, b) => b.id - a.id); 
+    } else if (this.sortOption === 'oldest') {
+      this.filteredScholarships.sort((a, b) => a.id - b.id);
     }
   }
 
-  // --- ÉVÉNEMENTS ---
+  // --- LOGIQUE DES TAGS (FILTRES VISUELS) ---
+  updateActiveTags() {
+    this.activeTags = [];
+    const f = this.activeFilters;
+
+    if (f.engineering) this.activeTags.push({ key: 'engineering', label: 'Engineering' });
+    if (f.medical) this.activeTags.push({ key: 'medical', label: 'Medical' });
+    if (f.business) this.activeTags.push({ key: 'business', label: 'Business' });
+    if (f.arts) this.activeTags.push({ key: 'arts', label: 'Arts' });
+    if (f.cs) this.activeTags.push({ key: 'cs', label: 'Computer Science' });
+    
+    if (f.undergrad) this.activeTags.push({ key: 'undergrad', label: 'Undergraduate' });
+    if (f.masters) this.activeTags.push({ key: 'masters', label: "Master's Degree" });
+    if (f.phd) this.activeTags.push({ key: 'phd', label: 'PhD' });
+    
+    if (f.closingSoon) this.activeTags.push({ key: 'closingSoon', label: 'Closing Soon' });
+    
+    if (f.location && f.location !== 'Any Location') {
+      this.activeTags.push({ key: 'location', label: f.location });
+    }
+  }
+
+  removeTag(tag: FilterTag) {
+    if (tag.key === 'location') {
+      this.activeFilters.location = 'Any Location';
+    } else {
+      this.activeFilters[tag.key] = false;
+    }
+    this.applyFilters();
+  }
+
+  // --- LOGIQUE PRINCIPALE ---
   handleFilterChange(newFilters: any) {
     this.activeFilters = newFilters;
     this.applyFilters();
@@ -87,14 +117,12 @@ export class ScholarshipsComponent implements OnInit {
 
   handleReset() {
     this.searchTerm = '';
-    this.activeFilters = { /* Reset manuel si nécessaire ou géré par l'enfant */ };
+    // Reset manuel des filtres si nécessaire (dépend de votre sidebar)
     this.applyFilters();
   }
 
-  // --- FILTRAGE ---
   applyFilters() {
     this.filteredScholarships = this.allScholarships.filter(item => {
-      
       // 1. Recherche Texte
       const term = this.searchTerm.toLowerCase();
       const matchesSearch = item.title.toLowerCase().includes(term) || item.description?.toLowerCase().includes(term);
@@ -115,7 +143,7 @@ export class ScholarshipsComponent implements OnInit {
         if (!match) return false;
       }
 
-      // 3. Filtres Level
+      // 3. Level
       const hasLevelFilter = f.undergrad || f.masters || f.phd;
       if (hasLevelFilter) {
         const level = item.level.toLowerCase();
@@ -140,12 +168,37 @@ export class ScholarshipsComponent implements OnInit {
       return true;
     });
 
-    // IMPORTANT : Après avoir filtré, on réinitialise la pagination à la page 1
+    // Mise à jour des Tags et du Tri
+    this.updateActiveTags();
+    this.sortResults();
+
     this.currentPage = 1;
     this.calculatePagination();
   }
 
-  // --- MAPPING ---
+  // --- PAGINATION (Code existant) ---
+  calculatePagination() {
+    this.totalPages = Math.ceil(this.filteredScholarships.length / this.itemsPerPage);
+    this.pagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    if (this.currentPage > this.totalPages) this.currentPage = 1;
+    if (this.totalPages === 0) this.currentPage = 1;
+    this.updatePaginatedList();
+  }
+
+  updatePaginatedList() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedScholarships = this.filteredScholarships.slice(startIndex, endIndex);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePaginatedList();
+    }
+  }
+
   private mapOpportunityToScholarship(op: Opportunity): Scholarship {
     const fullText = (op.title + ' ' + op.description).toLowerCase();
     const tags: string[] = [];
