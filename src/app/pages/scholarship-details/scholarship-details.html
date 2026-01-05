@@ -1,0 +1,55 @@
+<div class="w-100 container-xl px-3 px-sm-4 px-lg-5 py-4 py-lg-5" *ngIf="opportunity">
+    
+    <nav class="d-flex align-items-center mb-4 overflow-x-auto text-nowrap no-scrollbar" style="font-size: 0.8rem;">
+        <div class="d-flex align-items-center">
+            <a routerLink="/" class="text-decoration-none text-slate-500 hover:text-primary-custom transition-colors">Home</a>
+            <span class="material-symbols-outlined mx-1 text-slate-400" style="font-size: 14px;">chevron_right</span>
+            
+            <a [routerLink]="listLink" class="text-decoration-none text-slate-500 hover:text-primary-custom transition-colors">
+                {{ sectionTitle }}
+            </a>
+            <span class="material-symbols-outlined mx-1 text-slate-400" style="font-size: 14px;">chevron_right</span>
+            
+            <span class="text-slate-600 fw-medium text-truncate" style="max-width: 250px;">{{ opportunity.title }}</span>
+        </div>
+    </nav>
+
+    <div class="row g-4 align-items-start">
+        <div class="col-12 col-lg-8">
+            <app-detail-content [opportunity]="opportunity"></app-detail-content>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <app-detail-sidebar 
+                [opportunity]="opportunity" 
+                [relatedOpportunities]="sidebarOpportunities">
+            </app-detail-sidebar>
+        </div>
+    </div>
+
+    <div class="mt-5 border-top border-slate-200 pt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h3 fw-bold text-slate-900 mb-0">More from {{ sectionTitle }}</h2>
+            <a [routerLink]="listLink" class="text-primary fw-bold text-decoration-none small">View All</a>
+        </div>
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            <div class="col" *ngFor="let item of relatedOpportunities">
+                <a [routerLink]="['/details', item.id]" class="text-decoration-none text-reset group d-block h-100">
+                    <div class="bg-surface rounded-xl border border-slate-200 overflow-hidden shadow-sm h-100 transition-colors hover:border-primary-custom">
+                        <div class="position-relative overflow-hidden" style="height: 8rem; background-color: #e2e8f0;">
+                            <img [src]="item.imageUrl" [alt]="item.title" class="w-100 h-100 object-cover transition-transform group-hover-scale"/>
+                            <div class="position-absolute top-0 start-0 m-2 bg-white bg-opacity-90 px-2 py-1 rounded fw-bold text-uppercase text-dark" style="font-size: 10px; backdrop-filter: blur(4px);">
+                                {{ item.type }}
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <h3 class="fw-bold text-slate-900 mb-1 text-truncate fs-6 group-hover-text-primary">{{ item.title }}</h3>
+                            <p class="small text-slate-500 mb-2" style="font-size: 0.75rem;">{{ item.organization }}</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

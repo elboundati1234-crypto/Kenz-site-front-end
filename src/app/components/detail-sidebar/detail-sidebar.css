@@ -1,0 +1,17 @@
+/* --- BOUTONS RONDS (Share / Bookmark) --- */
+.hover-bg-primary-light:hover {
+    background-color: var(--primary-light) !important;
+}
+
+.hover-text-primary:hover span {
+    color: var(--primary-custom) !important;
+}
+
+/* --- LISTE SIMILAIRE --- */
+/* Petit badge type */
+.text-success { color: var(--accent-green) !important; }
+
+/* Bordure au survol */
+.group:hover {
+    border-color: var(--primary-custom) !important;
+}

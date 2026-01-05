@@ -1,0 +1,17 @@
+/* Sidebar Checkboxes */
+.form-check-input:checked {
+    background-color: var(--primary-color, #137fec);
+    border-color: var(--primary-color, #137fec);
+}
+.form-check-label {
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: #475569;
+}
+.form-check:hover .form-check-label {
+    color: var(--primary-color, #137fec);
+}
+.badge.bg-light {
+    background-color: #f1f5f9 !important;
+    color: #64748b !important;
+}

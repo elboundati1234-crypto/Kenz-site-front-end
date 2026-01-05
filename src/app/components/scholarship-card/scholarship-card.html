@@ -1,0 +1,41 @@
+<a [routerLink]="['/details', scholarship.id]" class="text-decoration-none text-dark h-100 d-block">
+  <div class="card h-100 bg-white border-0 shadow-sm overflow-hidden group">
+      <div class="card-img-wrapper position-relative">
+          <img [src]="scholarship.image" class="card-img-top object-cover" [alt]="scholarship.title" loading="lazy">
+          <span class="badge position-absolute top-0 start-0 m-3 border"
+                [ngClass]="'bg-' + scholarship.badgeColor + '-subtle text-' + scholarship.badgeColor + '-emphasis border-' + scholarship.badgeColor + '-subtle'">
+              {{ scholarship.category }}
+          </span>
+      </div>
+      
+      <div class="card-body d-flex flex-column p-4">
+          <h5 class="card-title fw-bold mb-2 text-truncate">{{ scholarship.title }}</h5>
+          <p class="card-text text-secondary small mb-4 text-truncate-2">{{ scholarship.description }}</p>
+          
+          <div class="mt-auto">
+              <div class="d-flex gap-3 text-secondary small mb-3">
+                  <div class="d-flex align-items-center gap-1">
+                      <span class="material-symbols-outlined text-primary-custom" style="font-size: 18px;">school</span>
+                      <span>{{ scholarship.level }}</span>
+                  </div>
+                  <div class="d-flex align-items-center gap-1">
+                      <span class="material-symbols-outlined" style="font-size: 18px;">location_on</span>
+                      <span class="text-truncate" style="max-width: 80px;">{{ scholarship.location }}</span>
+                  </div>
+              </div>
+              
+              <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                  <div class="d-flex align-items-center gap-1 text-secondary">
+                      <span class="material-symbols-outlined" style="font-size: 18px;">calendar_month</span>
+                      <span class="small">{{ scholarship.deadline }}</span>
+                  </div>
+                  <span class="fw-bold">{{ scholarship.amount }}</span>
+              </div>
+              
+              <button class="btn btn-outline-primary border-0 bg-primary-subtle text-primary-custom w-100 d-block mt-3">
+                  View Details
+              </button>
+          </div>
+      </div>
+  </div>
+</a>

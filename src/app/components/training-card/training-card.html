@@ -1,0 +1,49 @@
+<div class="card h-100 rounded-3 overflow-hidden border shadow-sm">
+    <div class="card-img-wrapper position-relative">
+        <img [src]="training.image" class="card-img-top" [alt]="training.title" loading="lazy">
+        
+        <div *ngIf="training.badgeType" 
+             class="position-absolute m-3 badge fw-bold shadow-sm d-flex align-items-center gap-1"
+             [ngClass]="getBadgeClass()"
+             [style.top]="'0'"
+             [style.left]="training.badgeType !== 'Popular' ? '0' : 'auto'"
+             [style.right]="training.badgeType === 'Popular' ? '0' : 'auto'">
+            <span *ngIf="training.badgeType === 'Featured'" class="material-symbols-outlined text-warning" style="font-size: 14px;">star</span>
+            {{ training.badgeType }}
+        </div>
+    </div>
+    
+    <div class="card-body d-flex flex-column p-4">
+        <div class="d-flex gap-2 mb-3">
+            <span class="badge rounded px-2 py-1 fw-medium" [ngClass]="getCategoryClass()">
+                {{ training.category }}
+            </span>
+            <span *ngIf="training.isCertified" class="badge bg-success-subtle text-success rounded px-2 py-1 fw-medium">Certified</span>
+        </div>
+        
+        <h5 class="card-title fw-bold lh-sm mb-2 fs-6 text-dark">{{ training.title }}</h5>
+        
+        <div class="d-flex align-items-center gap-2 mb-3 small text-secondary">
+            <span class="material-symbols-outlined fs-6">school</span>
+            <span>{{ training.organization }}</span>
+        </div>
+        
+        <p class="card-text small text-secondary text-truncate-2 mb-4">
+            {{ training.description || 'No description available.' }}
+        </p>
+        
+        <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
+            <div class="d-flex flex-column">
+                <span class="small text-secondary" style="font-size: 0.75rem;">Duration</span>
+                <span class="small fw-bold text-dark">{{ training.duration }}</span>
+            </div>
+            
+            <a [routerLink]="['/details', training.id]" 
+               class="text-primary fw-bold small text-decoration-none d-flex align-items-center gap-1 link-hover"
+               style="color: var(--bs-primary) !important;">
+                View Details 
+                <span class="material-symbols-outlined fs-6">arrow_forward</span>
+            </a>
+        </div>
+    </div>
+</div>
