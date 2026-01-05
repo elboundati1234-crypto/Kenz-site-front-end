@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 // Import des composants
 import { ScholarshipsComponent } from './pages/scholarships/scholarships';
 import { ScholarshipDetailsComponent } from './pages/scholarship-details/scholarship-details';
-import { TrainingsComponent } from './pages/trainings/trainings'; // <--- NOUVEL IMPORT
+import { TrainingsComponent } from './pages/trainings/trainings'; 
 
 export const routes: Routes = [
   // Page d'accueil (Redirige vers la liste des bourses par défaut)

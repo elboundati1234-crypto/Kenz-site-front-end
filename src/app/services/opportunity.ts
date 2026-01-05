@@ -203,7 +203,7 @@ export class OpportunityService {
       deadline: "Open",
       value: "Paid",
       duration: "12 Weeks",
-      tags: ["Featured"], // Pour déclencher le badge Featured
+      tags: ["Featured"], 
       language: "English",
       registrationLink: "#"
     },
@@ -223,7 +223,7 @@ export class OpportunityService {
       deadline: "Open",
       value: "Paid",
       duration: "6 Weeks",
-      tags: ["Popular"], // Pour déclencher le badge Popular
+      tags: ["Popular"], 
       language: "English",
       registrationLink: "#"
     },
@@ -265,7 +265,7 @@ export class OpportunityService {
       duration: "12 Weeks",
       language: "English",
       registrationLink: "#",
-      tags: ["Featured"] // Déclenche le badge Featured (Jaune)
+      tags: ["Featured"] 
     },
     {
       id: 205,
@@ -285,7 +285,7 @@ export class OpportunityService {
       duration: "6 Weeks",
       language: "English",
       registrationLink: "#",
-      tags: ["Popular"] // Déclenche le badge Popular (Orange)
+      tags: ["Popular"] 
     },
     {
       id: 206,
@@ -321,7 +321,7 @@ export class OpportunityService {
       benefits: "Free Certification",
       eligibility: ["Everyone"],
       deadline: "Open",
-      value: "Free", // Déclenche le badge Free (Vert)
+      value: "Free", 
       duration: "5 Months",
       language: "English",
       registrationLink: "#",
