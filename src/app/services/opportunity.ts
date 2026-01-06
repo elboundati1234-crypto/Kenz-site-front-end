@@ -346,7 +346,67 @@ export class OpportunityService {
       language: "English",
       registrationLink: "#",
       tags: ["Popular"]
-    }
+    },
+// NOUVEL EVENT : Tech Conference
+    {
+      id: 301,
+      title: "Global AI Summit 2026",
+      type: 'Event',
+      organization: 'AI Future Council',
+      orgDescription: 'Innovation and ethics in AI.',
+      location: 'Paris, France',
+      updatedAt: '3 hours ago',
+      imageUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800',
+      logoUrl: '',
+      description: "A premier event gathering the world's leading experts to discuss the future of Artificial Intelligence and Machine Learning.",
+      benefits: "Networking with experts, Certificate of Attendance",
+      eligibility: ["Tech Enthusiasts", "Professionals", "Students"],
+      deadline: "Jan 15, 2026",
+      value: "€150 (Free for Students)",
+      duration: "3 Days",
+      language: "English",
+      registrationLink: "#"
+    },
+    // NOUVEL EVENT : Hackathon
+    {
+      id: 302,
+      title: "Innovate Morocco Hackathon",
+      type: 'Event',
+      organization: 'Startup Hub',
+      orgDescription: 'Accelerating digital transformation.',
+      location: 'Casablanca, Morocco',
+      updatedAt: '12 hours ago',
+      imageUrl: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800',
+      logoUrl: '',
+      description: "48 hours of intense coding and problem-solving to build solutions for sustainable energy.",
+      benefits: "Prize pool of $10,000, Mentorship",
+      eligibility: ["Developers", "Designers", "Entrepreneurs"],
+      deadline: "Feb 10, 2026",
+      value: "Free",
+      duration: "2 Days",
+      language: "French/English",
+      registrationLink: "#"
+    },
+    // NOUVEL EVENT : Webinar
+    {
+      id: 303,
+      title: "Remote Work & Global Careers",
+      type: 'Event',
+      organization: 'WorkWorld',
+      orgDescription: 'Future of work platform.',
+      location: 'Online (Zoom)',
+      updatedAt: '1 day ago',
+      imageUrl: 'https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?w=800',
+      logoUrl: '',
+      description: "Virtual panel discussion about landing high-paying remote jobs and navigating digital nomad visas.",
+      benefits: "Resource Kit, Q&A Session",
+      eligibility: ["Everyone"],
+      deadline: "Open",
+      value: "Free",
+      duration: "2 Hours",
+      language: "English",
+      registrationLink: "#"
+    },
   ];
 
   getOpportunities(): Observable<Opportunity[]> {

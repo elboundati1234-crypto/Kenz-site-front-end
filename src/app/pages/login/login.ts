@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, Mail, Lock, Eye, EyeOff } from 'lucide-angular';
-import { SupabaseService } from '../../services/opportunity';
+import { UserService } from '../../services/user';
+
+
 
 @Component({
   selector: 'app-login',
@@ -25,7 +27,8 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private supabaseService: SupabaseService,
+    private userService: UserService,
+
     private router: Router
   ) {
     this.loginForm = this.fb.group({
@@ -45,7 +48,7 @@ export class LoginComponent {
 
       try {
         const { email, password } = this.loginForm.value;
-        await this.supabaseService.signIn(email, password);
+        await this.userService.signIn(email, password);
         this.router.navigate(['/dashboard']);
       } catch (error: any) {
         this.errorMessage = 'Email ou mot de passe incorrect';

@@ -1,53 +1,115 @@
-.event-card {
-  border-radius: 12px;
-  transition: transform 0.2s;
-  overflow: hidden;
+/* --- Custom Theme Overrides --- */
+:host {
+    --bs-primary: #137fec;
+    --bs-primary-rgb: 19, 127, 236;
+    --bs-body-bg: #f6f7f8;
+    --bs-body-font-family: 'Lexend', sans-serif;
+    display: block;
+    font-family: 'Lexend', sans-serif;
+    color: #0f172a;
 }
 
-.event-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+/* Material Symbols Utility */
+.material-symbols-outlined {
+    vertical-align: middle;
 }
 
-.card-img-wrapper {
-  height: 200px;
-  overflow: hidden;
+/* Navbar Customization */
+.navbar {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+.nav-link {
+    color: #111418;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+.nav-link:hover, .nav-link.active {
+    color: var(--bs-primary);
 }
 
-.card-img-top {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
+/* Card Customization */
+.card {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem; /* rounded-xl */
+    transition: all 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-.event-card:hover .card-img-top {
-  transform: scale(1.05);
+/* Card Image Wrapper to match "bg-cover" behavior */
+.card-img-holder {
+    height: 12rem; /* h-48 */
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+}
+.card:hover .card-img-holder {
+    transform: scale(1.05); /* Zoom effect on image */
+    transition: transform 0.5s ease;
 }
 
-.card-badge-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 2;
+/* Badges */
+.badge-custom {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 10;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid;
 }
 
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+/* Search Bar Wrapper */
+.search-bar-container {
+    background: white;
+    border: 1px solid #f1f5f9;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-/* Pagination Styling to match theme */
-.page-link {
-  color: #2563EB;
-  border: none;
-  margin: 0 4px;
-  border-radius: 8px;
+/* Input styling */
+.form-control-custom {
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    padding-left: 2.5rem; /* Space for icon */
+}
+.form-control-custom:focus {
+    background-color: white;
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 1px var(--bs-primary);
+}
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
 }
 
-.page-item.active .page-link {
-  background-color: #2563EB;
-  color: white;
+/* Filter Buttons */
+.btn-filter {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+.btn-filter:hover {
+    background-color: #f1f5f9;
+}
+
+/* Footer links */
+footer a {
+    text-decoration: none;
 }

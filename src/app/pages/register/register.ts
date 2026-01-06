@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, Mail, Lock, Eye, EyeOff, User, Phone, GraduationCap, BookOpen, Globe } from 'lucide-angular';
-import { SupabaseService } from '../../services/opportunity';
+import { UserService } from '../../services/user';
+
 
 @Component({
   selector: 'app-register',
@@ -32,7 +33,7 @@ export class RegisterComponent {
 
   constructor(
     private fb: FormBuilder,
-    private supabaseService: SupabaseService,
+    private userService: UserService,
     private router: Router
   ) {
     this.registerForm = this.fb.group({
@@ -123,7 +124,7 @@ export class RegisterComponent {
 
     try {
       const formValue = this.registerForm.value;
-      await this.supabaseService.signUp({
+      await this.userService.signUp({
         email: formValue.email,
         password: formValue.password,
         firstName: formValue.firstName,
@@ -153,7 +154,7 @@ export class RegisterComponent {
           ? formValue.targetCountries.split(',').map((country: string) => country.trim())
           : [];
 
-        await this.supabaseService.signUp({
+        await this.userService.signUp({
           email: formValue.email,
           password: formValue.password,
           firstName: formValue.firstName,

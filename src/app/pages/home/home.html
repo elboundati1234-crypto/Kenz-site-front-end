@@ -1,13 +1,18 @@
 <div class="container py-4">
-  
+
   <div class="hero-banner position-relative rounded-4 overflow-hidden mb-5">
+
     <div class="hero-bg position-absolute w-100 h-100"></div>
-    <div class="hero-overlay position-absolute w-100 h-100 bg-dark opacity-50"></div>
-    
-    <div class="position-relative z-1 text-center text-white px-3 d-flex flex-column align-items-center justify-content-center h-100">
+
+    <div class="hero-overlay position-absolute w-100 h-100 bg-dark opacity-75"></div>
+
+    <div
+      class="position-relative z-1 text-center text-white px-3 d-flex flex-column align-items-center justify-content-center h-100 py-5"
+      style="min-height: 450px;">
       <h1 class="fw-bold display-5 mb-3">Votre avenir commence ici</h1>
       <p class="lead mb-4 opacity-90" style="max-width: 700px; font-size: 1.1rem;">
-        Accédez aux meilleures bourses, développez vos compétences avec nos formations et participez aux événements étudiants incontournables.
+        Accédez aux meilleures bourses, développez vos compétences avec nos formations et participez aux événements
+        étudiants incontournables.
       </p>
 
       <div class="bg-white p-2 rounded-3 shadow-sm d-flex w-100" style="max-width: 600px;">
@@ -24,7 +29,7 @@
 
   <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
     <h2 class="h4 fw-bold mb-0">Suggestions pour vous</h2>
-    
+
     <div class="d-flex gap-2 flex-wrap">
       <button class="btn btn-dark d-flex align-items-center gap-2 rounded-pill px-3 py-2 text-sm">
         <lucide-icon [img]="GridIcon" size="16"></lucide-icon> Tout voir
@@ -44,32 +49,48 @@
   <div class="row g-4 mb-5">
     <div class="col-md-6 col-lg-4" *ngFor="let item of opportunities">
       <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden card-hover">
+
         <div class="position-relative" style="height: 200px;">
-          <img [src]="item.image" class="w-100 h-100 object-fit-cover" [alt]="item.title">
-          
+          <img [src]="item.imageUrl" class="w-100 h-100 object-fit-cover" [alt]="item.title">
+
           <span class="position-absolute top-0 start-0 m-3 badge rounded-pill px-3 py-2 fw-500 shadow-sm"
-                [ngClass]="item.category === 'Bourse' ? 'bg-primary-subtle text-primary' : 
-                           item.category === 'Formation' ? 'bg-success-subtle text-success' : 
-                           'bg-warning-subtle text-dark'">
-            <ng-container *ngIf="item.category === 'Bourse'"><lucide-icon [img]="ScholarshipIcon" size="14" class="me-1"></lucide-icon></ng-container>
-            <ng-container *ngIf="item.category === 'Formation'"><lucide-icon [img]="TrainingIcon" size="14" class="me-1"></lucide-icon></ng-container>
-            <ng-container *ngIf="item.category === 'Événement'"><lucide-icon [img]="CalendarIcon" size="14" class="me-1"></lucide-icon></ng-container>
-            {{ item.category }}
+            [ngClass]="getCategoryTheme(item.type).badge">
+            <ng-container *ngIf="item.type === 'Scholarship'">
+              <lucide-icon [img]="ScholarshipIcon" size="14" class="me-1"></lucide-icon>
+            </ng-container>
+            <ng-container *ngIf="item.type === 'Training'">
+              <lucide-icon [img]="TrainingIcon" size="14" class="me-1"></lucide-icon>
+            </ng-container>
+            <ng-container *ngIf="item.type === 'Event'">
+              <lucide-icon [img]="CalendarIcon" size="14" class="me-1"></lucide-icon>
+            </ng-container>
+            {{ translateType(item.type) }}
           </span>
 
-          <div *ngIf="item.date" class="position-absolute bottom-0 end-0 m-3 bg-dark text-white rounded px-2 py-1 text-xs opacity-90">
-            {{ item.date }}
+          <div *ngIf="item.deadline"
+            class="position-absolute bottom-0 end-0 m-3 bg-dark text-white rounded px-2 py-1 text-xs opacity-90 d-flex align-items-center gap-1">
+            <lucide-icon [img]="CalendarIcon" size="12"></lucide-icon> {{ item.deadline }}
           </div>
         </div>
 
         <div class="card-body p-4 d-flex flex-column">
-          <h5 class="card-title fw-bold mb-2">{{ item.title }}</h5>
-          <p class="card-text text-secondary small mb-4 flex-grow-1" style="line-height: 1.6;">
+          <h5 class="card-title fw-bold mb-2 text-truncate">{{ item.title }}</h5>
+
+          <div class="mb-3 small text-secondary d-flex align-items-center gap-2">
+            <span class="fw-bold text-dark">{{ item.organization }}</span> •
+            <span class="d-flex align-items-center gap-1">
+              <lucide-icon [img]="MapPinIcon" size="12"></lucide-icon> {{ item.location }}
+            </span>
+          </div>
+
+          <p class="card-text text-secondary small mb-4 flex-grow-1"
+            style="line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
             {{ item.description }}
           </p>
-          
-          <button class="btn w-100 fw-bold py-2 rounded-3 border-0"
-                  [ngClass]="getCategoryTheme(item.category).btn">
+
+          <button [routerLink]="['/details', item.id]"
+            class="btn w-100 fw-bold py-2 rounded-3 border-0 transition-btn"
+            [ngClass]="getCategoryTheme(item.type).btn">
             Voir les détails
           </button>
         </div>
@@ -78,7 +99,8 @@
   </div>
 
   <div class="text-center mb-5">
-    <a routerLink="/events" class="text-secondary text-decoration-none small d-flex align-items-center justify-content-center gap-1 hover-primary">
+    <a routerLink="/events"
+      class="text-secondary text-decoration-none small d-flex align-items-center justify-content-center gap-1 hover-primary">
       Voir plus d'opportunités <lucide-icon [img]="ArrowRightIcon" size="14"></lucide-icon>
     </a>
   </div>
