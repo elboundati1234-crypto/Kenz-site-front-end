@@ -1,0 +1,104 @@
+<div class="bg-light min-vh-100 py-5">
+  <div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-5">
+      <div>
+        <h1 class="h3 fw-bold text-dark">Explore Opportunities</h1>
+        <p class="text-secondary mb-0">Discover events, scholarships, and training tailored for you.</p>
+      </div>
+    </div>
+
+    <div class="bg-white p-3 rounded-3 shadow-sm mb-5">
+      <div class="row g-3">
+        <div class="col-md-5">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+              <lucide-icon [img]="SearchIcon" class="text-secondary" size="18"></lucide-icon>
+            </span>
+            <input
+              type="text"
+              class="form-control border-start-0 ps-0"
+              placeholder="Search by keyword..."
+              [(ngModel)]="searchTerm"
+              (input)="applyFilters()"
+            >
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedType" (change)="applyFilters()">
+            <option value="">All Categories</option>
+            <option value="Scholarship">Scholarships</option>
+            <option value="Event">Events</option>
+            <option value="Workshop">Workshops</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <select class="form-select">
+            <option>Location</option>
+            <option>Online</option>
+            <option>In Person</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <select class="form-select">
+            <option>Sort By</option>
+            <option>Date (Newest)</option>
+            <option>Date (Oldest)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4" *ngFor="let item of filteredOpportunities">
+        <div class="card h-100 border-0 shadow-sm event-card">
+          <div class="position-relative card-img-wrapper">
+            <img [src]="item.image" class="card-img-top" [alt]="item.title">
+            <div class="card-badge-overlay d-flex justify-content-between w-100 px-3 pt-3">
+              <span class="badge bg-white text-dark shadow-sm">{{ item.category }}</span>
+              <span *ngIf="item.isOnline" class="badge bg-success shadow-sm d-flex align-items-center gap-1">
+                <lucide-icon [img]="GlobeIcon" size="12"></lucide-icon> Online
+              </span>
+            </div>
+          </div>
+
+          <div class="card-body p-4">
+            <h5 class="card-title fw-bold text-dark mb-2">{{ item.title }}</h5>
+
+            <div class="d-flex flex-column gap-2 text-secondary small mb-3">
+              <div *ngIf="item.date" class="d-flex align-items-center gap-2">
+                <lucide-icon [img]="CalendarIcon" class="text-primary" size="16"></lucide-icon>
+                {{ item.date | date:'mediumDate' }}
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <lucide-icon [img]="MapPinIcon" class="text-primary" size="16"></lucide-icon>
+                {{ item.location }}
+              </div>
+            </div>
+
+            <p class="card-text text-secondary small line-clamp-3 mb-4">
+              {{ item.description }}
+            </p>
+
+            <button class="btn btn-outline-primary w-100 fw-500">View Details</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-5">
+      <nav>
+        <ul class="pagination">
+          <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+          <li class="page-item active"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">Next</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

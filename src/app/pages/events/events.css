@@ -1,0 +1,53 @@
+.event-card {
+  border-radius: 12px;
+  transition: transform 0.2s;
+  overflow: hidden;
+}
+
+.event-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+.card-img-wrapper {
+  height: 200px;
+  overflow: hidden;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.event-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-badge-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Pagination Styling to match theme */
+.page-link {
+  color: #2563EB;
+  border: none;
+  margin: 0 4px;
+  border-radius: 8px;
+}
+
+.page-item.active .page-link {
+  background-color: #2563EB;
+  color: white;
+}
