@@ -1,0 +1,58 @@
+/* Hero Styles */
+.hero-banner {
+  height: 400px;
+  background-color: #333; /* Fallback */
+}
+
+.hero-bg {
+  /* You can replace this URL with a specific local image if needed */
+  background: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+}
+
+/* Text Utilities */
+.text-sm {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Button & Pill overrides */
+.btn-white {
+  background-color: white;
+  border-color: #e5e7eb;
+  color: #374151;
+}
+
+.btn-white:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+/* Card Styles */
+.object-fit-cover {
+  object-fit: cover;
+}
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+}
+
+/* Background Colors for Badges (Subtle) */
+.bg-primary-subtle { background-color: #ebf5ff !important; }
+.bg-success-subtle { background-color: #f0fdf4 !important; }
+.bg-warning-subtle { background-color: #fffbeb !important; }
+
+/* Link Hover */
+.hover-primary:hover {
+  color: #2563EB !important;
+  text-decoration: underline !important;
+}
