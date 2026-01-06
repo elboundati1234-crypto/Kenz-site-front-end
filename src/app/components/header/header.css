@@ -1,0 +1,50 @@
+/* Couleur de l'icône et du texte primaire */
+.text-primary-custom {
+    color: var(--primary-custom) !important;
+}
+
+/* Espacement des lettres du logo */
+.navbar-brand {
+    letter-spacing: -0.015em;
+}
+
+/* Liens de navigation */
+.nav-link {
+    font-size: 0.95rem;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary-custom) !important;
+}
+
+/* Bouton "Sign Up" (Bleu) */
+.btn-primary-custom {
+    background-color: var(--primary-custom);
+    color: white;
+    border: none;
+    font-weight: 700;
+    transition: background-color 0.2s;
+}
+
+.btn-primary-custom:hover {
+    background-color: #0f6ac6;
+}
+
+/* Bouton "Login" (Gris clair) */
+.btn-light-custom {
+    background-color: #f1f5f9;
+    color: #111418;
+    font-weight: 700;
+    border: none;
+    transition: background-color 0.2s;
+}
+
+.btn-light-custom:hover {
+    background-color: #e2e8f0;
+}
+
+/* Ombre légère sous le header */
+.shadow-sm {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+}
