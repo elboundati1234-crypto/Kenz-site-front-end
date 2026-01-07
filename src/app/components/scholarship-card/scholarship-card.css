@@ -1,0 +1,44 @@
+/* --- IMAGE & CONTENEUR --- */
+.card-img-wrapper {
+    height: 180px; /* Force une hauteur fixe pour l'alignement */
+    overflow: hidden;
+    position: relative;
+}
+
+.object-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* L'image remplit le cadre sans déformation */
+    transition: transform 0.5s ease;
+}
+
+/* Zoom léger au survol de la carte */
+.group:hover .object-cover {
+    transform: scale(1.05);
+}
+
+/* --- TEXTE TRONQUÉ (Pour aligner les cartes) --- */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limite à 2 lignes */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+}
+
+/* --- BADGES ET STYLE --- */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px); /* La carte monte un peu */
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.card-badge {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.95); /* Fond semi-transparent */
+}

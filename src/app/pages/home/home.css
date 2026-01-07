@@ -1,0 +1,44 @@
+/* Hero Styles */
+.hero-banner {
+  /* Hauteur minimale pour garantir l'affichage */
+  min-height: 450px;
+  background-color: #333; /* Couleur de fond de secours */
+  position: relative;
+}
+
+.hero-bg {
+  /* L'image est définie ici pour éviter les erreurs HTML */
+  background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') !important;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Utilities */
+.text-sm { font-size: 0.9rem; font-weight: 500; }
+.text-xs { font-size: 0.75rem; font-weight: 600; }
+
+.btn-white {
+  background-color: white;
+  border-color: #e5e7eb;
+  color: #374151;
+}
+.btn-white:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.object-fit-cover { object-fit: cover; }
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+}
+
+/* Couleurs des Badges */
+.bg-primary-subtle { background-color: #ebf5ff !important; color: #1e40af !important; }
+.bg-success-subtle { background-color: #f0fdf4 !important; color: #166534 !important; }
+.bg-warning-subtle { background-color: #fffbeb !important; color: #92400e !important; }

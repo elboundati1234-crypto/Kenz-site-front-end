@@ -1,0 +1,124 @@
+<div class="hero-section d-flex align-items-center justify-content-center p-4 text-center text-white" 
+     style='background-image: linear-gradient(rgba(19, 127, 236, 0.9), rgba(16, 25, 34, 0.9)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBUahCExusFLzbr_FzQGpHCxCkuHSXURYYdh6_3aEV7ZHuBR-ClPM6x6ez69C6cOS1p_CB1e9yLRv2RvvCWL5e_Bl3ydOfGHM4HlCT1ewHrm53RjxBl1-24SsaM8X-sfc9ZcVLDdWttHfOkKh96uzQbnFWUQ1ptSuOlaOLjJogQBBfaYxL9TzBqEaogerkaeNAW7pan0ufjjWAQdmGR7W6SHG6DaGsgRDMXYm7HzUTOwHBBl6_lZDXnAU8tH7EpFhvorV5nCZxRD4-7"); min-height: 320px; background-size: cover; background-position: center;'>
+    
+    <div class="d-flex flex-column gap-4 w-100 align-items-center">
+        <div style="max-width: 720px;">
+            <h1 class="display-4 fw-bold">Find the perfect training</h1>
+            <p class="fs-5 opacity-75 fw-normal">Boost your career with certified courses and bootcamps.</p>
+        </div>
+        
+        <div class="w-100" style="max-width: 560px;">
+            <div class="input-group input-group-lg shadow rounded-3 bg-white overflow-hidden">
+                <span class="input-group-text border-0 bg-white ps-4">
+                    <span class="material-symbols-outlined text-secondary">search</span>
+                </span>
+                <input type="text" class="form-control border-0 shadow-none" 
+                       placeholder="Search for Python, Marketing..." 
+                       [(ngModel)]="searchTerm" 
+                       (keyup.enter)="onSearch()">
+                <button class="btn btn-primary px-4 fw-bold border-0" (click)="onSearch()">Search</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-xl px-3 px-lg-4 py-5">
+    
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb mb-0 align-items-center small">
+            <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none text-secondary fw-medium hover-primary">Home</a></li>
+            <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Trainings</li>
+        </ol>
+    </nav>
+
+    <div class="row gx-lg-5">
+        
+        <aside class="col-lg-3 d-none d-lg-block">
+            <app-training-filter 
+                (filterChange)="handleFilterChange($event)"
+                (reset)="handleReset()">
+            </app-training-filter>
+        </aside>
+
+        <main class="col-lg-9">
+            
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
+                <div>
+                    <h2 class="h4 fw-bold mb-0">Available Trainings</h2>
+                    <p class="text-secondary small mb-0">Showing {{ filteredTrainings.length }} results</p>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <span class="text-secondary me-2 small fw-medium">Sort by:</span>
+                    <select class="form-select form-select-sm border-0 bg-light fw-bold text-dark w-auto" 
+                            style="min-width: 140px; cursor: pointer;"
+                            [(ngModel)]="sortOption" 
+                            (change)="onSortChange()">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="relevant">Most Relevant</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-4" *ngIf="activeTags.length > 0">
+                <div class="badge bg-primary rounded-pill px-3 py-2 d-flex align-items-center gap-2 fw-normal" 
+                     *ngFor="let tag of activeTags">
+                    {{ tag.label }}
+                    <span class="material-symbols-outlined" 
+                          style="cursor: pointer; font-size: 14px;" 
+                          (click)="removeTag(tag)">close</span>
+                </div>
+
+                <button class="btn btn-link text-decoration-none p-0 ms-2 small fw-bold" 
+                        style="font-size: 0.85rem;" 
+                        (click)="handleReset()">
+                    Clear all
+                </button>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                <div class="col" *ngFor="let item of paginatedTrainings">
+                    <app-training-card [training]="item"></app-training-card>
+                </div>
+                
+                <div *ngIf="filteredTrainings.length === 0" class="col-12 text-center py-5">
+                    <span class="material-symbols-outlined fs-1 text-secondary mb-3">search_off</span>
+                    <p class="text-secondary">No trainings found matching your criteria.</p>
+                    <button class="btn btn-outline-primary btn-sm mt-2" (click)="handleReset()">Clear Filters</button>
+                </div>
+            </div>
+
+            <div class="mt-5 d-flex justify-content-center" *ngIf="totalPages > 1">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination gap-2">
+                        <li class="page-item" [class.disabled]="currentPage === 1">
+                            <button class="page-link rounded-3 border text-secondary" 
+                                    (click)="changePage(currentPage - 1)" 
+                                    [disabled]="currentPage === 1">
+                                <span class="material-symbols-outlined fs-6" style="vertical-align: middle;">chevron_left</span>
+                            </button>
+                        </li>
+
+                        <li class="page-item" *ngFor="let page of pagesArray">
+                            <button class="page-link rounded-3 fw-bold" 
+                                    [ngClass]="currentPage === page ? 'bg-primary text-white border-primary' : 'border text-dark hover-bg-light'"
+                                    (click)="changePage(page)">
+                                {{ page }}
+                            </button>
+                        </li>
+
+                        <li class="page-item" [class.disabled]="currentPage === totalPages">
+                            <button class="page-link rounded-3 border text-secondary" 
+                                    (click)="changePage(currentPage + 1)" 
+                                    [disabled]="currentPage === totalPages">
+                                <span class="material-symbols-outlined fs-6" style="vertical-align: middle;">chevron_right</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </main>
+    </div>
+</div>

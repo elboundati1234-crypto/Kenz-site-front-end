@@ -1,0 +1,46 @@
+/* Couleur du logo et des titres */
+.text-primary-custom {
+    color: var(--primary-custom) !important;
+}
+
+/* Liens du footer (gris vers bleu au survol) */
+.footer-link {
+    transition: color 0.2s ease;
+    cursor: pointer;
+}
+
+.footer-link:hover {
+    color: var(--primary-custom) !important;
+}
+
+/* Icônes réseaux sociaux */
+.hover-primary {
+    transition: color 0.2s ease;
+}
+
+.hover-primary:hover {
+    color: var(--primary-custom) !important;
+}
+
+/* Champ Email Newsletter */
+.form-control {
+    background-color: #f8f9fa; /* bg-light */
+    border: none;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 0.25rem rgba(19, 127, 236, 0.25); /* Ombre bleue */
+}
+
+/* Bouton "Go" de la newsletter */
+.btn-primary-custom {
+    background-color: var(--primary-custom);
+    color: white;
+    border: none;
+    font-weight: 700;
+}
+
+.btn-primary-custom:hover {
+    background-color: #0f6ac6;
+}

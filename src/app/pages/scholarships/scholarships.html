@@ -1,0 +1,115 @@
+<section class="bg-white py-5">
+  <div class="container text-center">
+      <div class="row justify-content-center">
+          <div class="col-lg-8">
+              <h1 class="display-4 fw-black text-dark mb-3">Find Your Future Funding</h1>
+              <p class="text-secondary fs-5 mb-5">Browse hundreds of scholarships tailored to your academic journey.</p>
+              
+              <div class="row justify-content-center">
+                  <div class="col-md-10 col-lg-8">
+                      <div class="input-group input-group-lg shadow rounded-4 search-container">
+                          <span class="input-group-text bg-white border-0 ps-4">
+                              <span class="material-symbols-outlined text-secondary">search</span>
+                          </span>
+                          <input type="text" class="form-control border-0 shadow-none" 
+                                 placeholder="Search by name, keyword..."
+                                 [(ngModel)]="searchTerm"
+                                 (input)="onSearch()">
+                          <button class="btn btn-primary-custom px-4 m-1 rounded-3" type="button" (click)="onSearch()">Search</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4">
+      
+      <aside class="col-lg-3">
+          <app-filter-sidebar 
+              (filterChange)="handleFilterChange($event)" 
+              (reset)="handleReset()">
+          </app-filter-sidebar>
+      </aside>
+
+      <main class="col-lg-9">
+          
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
+              <div>
+                  <h2 class="h4 fw-bold mb-0">Available Scholarships</h2>
+                  <p class="text-secondary small mb-0">Showing {{ filteredScholarships.length }} results</p>
+              </div>
+
+              <div class="d-flex align-items-center">
+                  <span class="text-secondary me-2 small fw-medium">Sort by:</span>
+                  <select class="form-select form-select-sm border-0 bg-light fw-bold text-dark w-auto" 
+                          style="min-width: 140px; cursor: pointer;"
+                          [(ngModel)]="sortOption" 
+                          (change)="onSortChange()">
+                      <option value="newest">Newest First</option>
+                      <option value="oldest">Oldest First</option>
+                  </select>
+              </div>
+          </div>
+
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-4" *ngIf="activeTags.length > 0">
+              <div class="badge bg-primary rounded-pill px-3 py-2 d-flex align-items-center gap-2 fw-normal" 
+                   *ngFor="let tag of activeTags">
+                  {{ tag.label }}
+                  <span class="material-symbols-outlined" 
+                        style="cursor: pointer; font-size: 14px;" 
+                        (click)="removeTag(tag)">close</span>
+              </div>
+
+              <button class="btn btn-link text-decoration-none p-0 ms-2 small fw-bold" 
+                      style="font-size: 0.85rem;" 
+                      (click)="handleReset()">
+                  Clear all
+              </button>
+          </div>
+
+          <div *ngIf="filteredScholarships.length === 0" class="alert alert-light text-center py-5">
+              <span class="material-symbols-outlined fs-1 text-secondary mb-3">search_off</span>
+              <h4 class="h5 fw-bold">No scholarships found</h4>
+              <p class="text-secondary">Try adjusting your filters.</p>
+          </div>
+
+          <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+              <div class="col" *ngFor="let item of paginatedScholarships">
+                  <app-scholarship-card [scholarship]="item"></app-scholarship-card>
+              </div>
+          </div>
+
+          <div class="mt-5 d-flex justify-content-center" *ngIf="totalPages > 1">
+            <nav aria-label="Page navigation">
+                <ul class="pagination gap-2">
+                    <li class="page-item" [class.disabled]="currentPage === 1">
+                        <button class="page-link rounded-3 border text-secondary" 
+                                (click)="changePage(currentPage - 1)" 
+                                [disabled]="currentPage === 1">
+                            <span class="material-symbols-outlined fs-6" style="vertical-align: middle;">chevron_left</span>
+                        </button>
+                    </li>
+                    <li class="page-item" *ngFor="let page of pagesArray">
+                        <button class="page-link rounded-3 fw-bold" 
+                                [ngClass]="currentPage === page ? 'bg-primary text-white border-primary' : 'border text-dark hover-bg-light'"
+                                (click)="changePage(page)">
+                            {{ page }}
+                        </button>
+                    </li>
+                    <li class="page-item" [class.disabled]="currentPage === totalPages">
+                        <button class="page-link rounded-3 border text-secondary" 
+                                (click)="changePage(currentPage + 1)" 
+                                [disabled]="currentPage === totalPages">
+                            <span class="material-symbols-outlined fs-6" style="vertical-align: middle;">chevron_right</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+          </div>
+
+      </main>
+  </div>
+</div>
