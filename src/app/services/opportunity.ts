@@ -48,6 +48,26 @@ export class OpportunityService {
       registrationLink: "#"
     },
     {
+      id: 203,
+      title: "Intro to Data Analytics",
+      type: "Training",
+      organization: "Global Data Hub",
+      orgDescription: "Data School",
+      location: "Online",
+      updatedAt: "3 days ago",
+      imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAzvkX5lwHBFrDZ-vOXEHyI20EeMu2q6kMA-6NPzzgj17HYyPOhSAY3gv_uTwFRNiZk1hzJWfNy-IlvPl1ZFzAx1Lm3TeKI81t7NBhAvC_DDOLR2mNdWZZU6T3sSGQPcPXa10twM2dqnNOj99robFLRylxzaDtN2k4sr5YD0P_7FApIrp3RdkyC-_r07qD5t9n6sR9P1ou947RehDFDsZtO8OPcg_gMvnOZkjaQjn1TDhSydmAzR6su37l6-7urhNSmqx8FS_P0YwgQ",
+      logoUrl: "",
+      description: "A beginner-friendly introduction to analyzing data, creating visualizations, and making data-driven decisions.",
+      benefits: "Free Access",
+      eligibility: ["Everyone"],
+      deadline: "Open",
+      value: "Free",
+      duration: "2 Days",
+      language: "English",
+      registrationLink: "#",
+      tags: []
+    },
+    {
       id: 4,
       title: "Women in Tech Grant",
       type: 'Scholarship',
@@ -64,6 +84,25 @@ export class OpportunityService {
       deadline: "Annual",
       value: "$5,000",
       duration: "1 Year",
+      language: "English",
+      registrationLink: "#"
+    },
+    {
+      id: 301,
+      title: "Global AI Summit 2026",
+      type: 'Event',
+      organization: 'AI Future Council',
+      orgDescription: 'Innovation and ethics in AI.',
+      location: 'Paris, France',
+      updatedAt: '3 hours ago',
+      imageUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800',
+      logoUrl: '',
+      description: "A premier event gathering the world's leading experts to discuss the future of Artificial Intelligence and Machine Learning.",
+      benefits: "Networking with experts, Certificate of Attendance",
+      eligibility: ["Tech Enthusiasts", "Professionals", "Students"],
+      deadline: "Jan 15, 2026",
+      value: "€150 (Free for Students)",
+      duration: "3 Days",
       language: "English",
       registrationLink: "#"
     },
@@ -203,7 +242,7 @@ export class OpportunityService {
       deadline: "Open",
       value: "Paid",
       duration: "12 Weeks",
-      tags: ["Featured"], 
+      tags: ["Featured"],
       language: "English",
       registrationLink: "#"
     },
@@ -223,29 +262,9 @@ export class OpportunityService {
       deadline: "Open",
       value: "Paid",
       duration: "6 Weeks",
-      tags: ["Popular"], 
+      tags: ["Popular"],
       language: "English",
       registrationLink: "#"
-    },
-    {
-      id: 203,
-      title: "Intro to Data Analytics",
-      type: "Training",
-      organization: "Global Data Hub",
-      orgDescription: "Data School",
-      location: "Online",
-      updatedAt: "3 days ago",
-      imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAzvkX5lwHBFrDZ-vOXEHyI20EeMu2q6kMA-6NPzzgj17HYyPOhSAY3gv_uTwFRNiZk1hzJWfNy-IlvPl1ZFzAx1Lm3TeKI81t7NBhAvC_DDOLR2mNdWZZU6T3sSGQPcPXa10twM2dqnNOj99robFLRylxzaDtN2k4sr5YD0P_7FApIrp3RdkyC-_r07qD5t9n6sR9P1ou947RehDFDsZtO8OPcg_gMvnOZkjaQjn1TDhSydmAzR6su37l6-7urhNSmqx8FS_P0YwgQ",
-      logoUrl: "",
-      description: "A beginner-friendly introduction to analyzing data, creating visualizations, and making data-driven decisions.",
-      benefits: "Free Access",
-      eligibility: ["Everyone"],
-      deadline: "Open",
-      value: "Free",
-      duration: "2 Days",
-      language: "English",
-      registrationLink: "#",
-      tags: []
     },
     {
       id: 204,
@@ -265,7 +284,7 @@ export class OpportunityService {
       duration: "12 Weeks",
       language: "English",
       registrationLink: "#",
-      tags: ["Featured"] 
+      tags: ["Featured"]
     },
     {
       id: 205,
@@ -285,7 +304,7 @@ export class OpportunityService {
       duration: "6 Weeks",
       language: "English",
       registrationLink: "#",
-      tags: ["Popular"] 
+      tags: ["Popular"]
     },
     {
       id: 206,
@@ -321,7 +340,7 @@ export class OpportunityService {
       benefits: "Free Certification",
       eligibility: ["Everyone"],
       deadline: "Open",
-      value: "Free", 
+      value: "Free",
       duration: "5 Months",
       language: "English",
       registrationLink: "#",
@@ -347,27 +366,6 @@ export class OpportunityService {
       registrationLink: "#",
       tags: ["Popular"]
     },
-// NOUVEL EVENT : Tech Conference
-    {
-      id: 301,
-      title: "Global AI Summit 2026",
-      type: 'Event',
-      organization: 'AI Future Council',
-      orgDescription: 'Innovation and ethics in AI.',
-      location: 'Paris, France',
-      updatedAt: '3 hours ago',
-      imageUrl: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800',
-      logoUrl: '',
-      description: "A premier event gathering the world's leading experts to discuss the future of Artificial Intelligence and Machine Learning.",
-      benefits: "Networking with experts, Certificate of Attendance",
-      eligibility: ["Tech Enthusiasts", "Professionals", "Students"],
-      deadline: "Jan 15, 2026",
-      value: "€150 (Free for Students)",
-      duration: "3 Days",
-      language: "English",
-      registrationLink: "#"
-    },
-    // NOUVEL EVENT : Hackathon
     {
       id: 302,
       title: "Innovate Morocco Hackathon",
