@@ -41,7 +41,7 @@ export class OpportunityService {
     // 1. Traduction du TYPE
     let mappedType: any = 'Scholarship';
     // On normalise en minuscule pour éviter les erreurs de casse
-    const rawType = (data.opportuniteType || '').toLowerCase();
+    const rawType = (data.type || '').toLowerCase();
     
     if (rawType.includes('bourse')) mappedType = 'Scholarship';
     else if (rawType.includes('formation')) mappedType = 'Training';
@@ -68,7 +68,7 @@ export class OpportunityService {
     return {
       id: data._id || data.id, 
       title: data.titre,
-      opportuniteType: mappedType, // Le type est maintenant en Anglais !
+      type: mappedType, // Le type est maintenant en Anglais !
       
       organization: data.organisme || 'Unknown',
       orgDescription: data.orgDescription,

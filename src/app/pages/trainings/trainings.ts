@@ -78,8 +78,8 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     this.opportunityService.getOpportunities().subscribe({
       next: (data: Opportunity[]) => {
         // 1. Filtrer les opportunités de type 'Training'
-        // ATTENTION : Utilisez bien 'opportuniteType' si vous avez changé le modèle
-        const rawData = data.filter(op => op.opportuniteType === 'Training');
+        // ATTENTION : Utilisez bien 'type' si vous avez changé le modèle
+        const rawData = data.filter(op => op.type === 'Training');
         
         // 2. Mapper vers le modèle Training
         this.allTrainings = rawData.map(op => this.mapToTraining(op));

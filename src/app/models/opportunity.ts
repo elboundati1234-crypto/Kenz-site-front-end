@@ -3,7 +3,7 @@ export interface Opportunity {
   id: string | number; 
   
   title: string;
-  opportuniteType: 'Scholarship' | 'Training' | 'Event' ;
+  type: 'Scholarship' | 'Training' | 'Event' ;
   
   organization: string;
   orgDescription?: string;

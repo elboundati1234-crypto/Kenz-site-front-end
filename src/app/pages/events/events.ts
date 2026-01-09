@@ -62,8 +62,8 @@ export class EventsComponent implements OnInit, OnDestroy {
 
     this.opportunityService.getOpportunities().subscribe({
       next: (data) => {
-        // Filtre strict sur 'Event' en utilisant la nouvelle propriété opportuniteType
-        const eventsOnly = data.filter(op => op.opportuniteType === 'Event');
+        // Filtre strict sur 'Event' en utilisant la nouvelle propriété type
+        const eventsOnly = data.filter(op => op.type === 'Event');
         
         this.opportunities = eventsOnly;
         this.filteredOpportunities = eventsOnly;

@@ -86,7 +86,7 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
         console.log("Données reçues du service:", opportunities.length);
 
         // Filtrage sécurisé
-        const rawData = opportunities.filter(op => op.opportuniteType === 'Scholarship');
+        const rawData = opportunities.filter(op => op.type === 'Scholarship');
         console.log("Bourses filtrées (Scholarship):", rawData.length);
 
         // Mapping

@@ -50,19 +50,19 @@
           <img [src]="item.imageUrl" class="w-100 h-100 object-fit-cover" [alt]="item.title">
 
           <span class="position-absolute top-0 start-0 m-3 badge rounded-pill px-3 py-2 fw-500 shadow-sm"
-            [ngClass]="getCategoryTheme(item.opportuniteType).badge">
+            [ngClass]="getCategoryTheme(item.type).badge">
             
-            <ng-container *ngIf="item.opportuniteType === 'Scholarship'">
+            <ng-container *ngIf="item.type === 'Scholarship'">
               <lucide-icon [img]="ScholarshipIcon" size="14" class="me-1"></lucide-icon>
             </ng-container>
-            <ng-container *ngIf="item.opportuniteType === 'Training'">
+            <ng-container *ngIf="item.type === 'Training'">
               <lucide-icon [img]="TrainingIcon" size="14" class="me-1"></lucide-icon>
             </ng-container>
-            <ng-container *ngIf="item.opportuniteType === 'Event'">
+            <ng-container *ngIf="item.type === 'Event'">
               <lucide-icon [img]="CalendarIcon" size="14" class="me-1"></lucide-icon>
             </ng-container>
             
-            {{ translateType(item.opportuniteType) }}
+            {{ translateType(item.type) }}
           </span>
 
           <div *ngIf="item.deadline"
@@ -90,7 +90,7 @@
 
           <button [routerLink]="['/details', item.id]"
             class="btn w-100 fw-bold py-2 rounded-3 border-0 transition-btn"
-            [ngClass]="getCategoryTheme(item.opportuniteType).btn">
+            [ngClass]="getCategoryTheme(item.type).btn">
             Voir les détails
           </button>
         </div>

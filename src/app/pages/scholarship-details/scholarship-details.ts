@@ -55,11 +55,11 @@ export class ScholarshipDetailsComponent implements OnInit {
         if (this.opportunity) {
           
           // Configuration du Titre et Lien retour
-          // Utilisation de opportuniteType (nouvelle propriété)
-          if (this.opportunity.opportuniteType === 'Training') {
+          // Utilisation de type (nouvelle propriété)
+          if (this.opportunity.type === 'Training') {
             this.sectionTitle = 'Trainings';
             this.listLink = '/trainings';
-          } else if (this.opportunity.opportuniteType === 'Event') {
+          } else if (this.opportunity.type === 'Event') {
             this.sectionTitle = 'Events';
             this.listLink = '/events';
           } else {
@@ -70,13 +70,13 @@ export class ScholarshipDetailsComponent implements OnInit {
           // --- LOGIQUE 1 : Bas de page (MÊME TYPE) ---
           this.relatedOpportunities = allData.filter(item => 
               String(item.id) !== currentId && // Exclure l'élément actuel
-              item.opportuniteType === this.opportunity!.opportuniteType
+              item.type === this.opportunity!.type
           ).slice(0, 4);
 
           // --- LOGIQUE 2 : Sidebar (TYPES DIFFÉRENTS) ---
           this.sidebarOpportunities = allData.filter(item => 
               String(item.id) !== currentId && 
-              item.opportuniteType !== this.opportunity!.opportuniteType 
+              item.type !== this.opportunity!.type 
           ).slice(0, 5); 
           
           // IMPORTANT : Force la mise à jour de l'interface
