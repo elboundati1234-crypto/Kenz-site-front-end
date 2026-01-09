@@ -1,18 +1,14 @@
 <div class="container py-4">
 
   <div class="hero-banner position-relative rounded-4 overflow-hidden mb-5">
-
     <div class="hero-bg position-absolute w-100 h-100"></div>
-
     <div class="hero-overlay position-absolute w-100 h-100 bg-dark opacity-75"></div>
 
-    <div
-      class="position-relative z-1 text-center text-white px-3 d-flex flex-column align-items-center justify-content-center h-100 py-5"
+    <div class="position-relative z-1 text-center text-white px-3 d-flex flex-column align-items-center justify-content-center h-100 py-5"
       style="min-height: 450px;">
       <h1 class="fw-bold display-5 mb-3">Votre avenir commence ici</h1>
       <p class="lead mb-4 opacity-90" style="max-width: 700px; font-size: 1.1rem;">
-        Accédez aux meilleures bourses, développez vos compétences avec nos formations et participez aux événements
-        étudiants incontournables.
+        Accédez aux meilleures bourses, développez vos compétences avec nos formations et participez aux événements étudiants incontournables.
       </p>
 
       <div class="bg-white p-2 rounded-3 shadow-sm d-flex w-100" style="max-width: 600px;">
@@ -34,13 +30,13 @@
       <button class="btn btn-dark d-flex align-items-center gap-2 rounded-pill px-3 py-2 text-sm">
         <lucide-icon [img]="GridIcon" size="16"></lucide-icon> Tout voir
       </button>
-      <button class="btn btn-white border d-flex align-items-center gap-2 rounded-pill px-3 py-2 text-sm">
+      <button [routerLink]="['/scholarships']" class="btn btn-white border d-flex align-items-center gap-2 rounded-pill px-3 py-2 text-sm">
         <lucide-icon [img]="ScholarshipIcon" class="text-primary" size="16"></lucide-icon> Bourses
       </button>
-      <button class="btn btn-white border d-flex align-items-center gap-2 rounded-pill px-3 py-2 text-sm">
+      <button [routerLink]="['/trainings']" class="btn btn-white border d-flex align-items-center gap-2 rounded-pill px-3 py-2 text-sm">
         <lucide-icon [img]="TrainingIcon" class="text-success" size="16"></lucide-icon> Formations
       </button>
-      <button class="btn btn-white border d-flex align-items-center gap-2 rounded-pill px-3 py-2 text-sm">
+      <button [routerLink]="['/events']" class="btn btn-white border d-flex align-items-center gap-2 rounded-pill px-3 py-2 text-sm">
         <lucide-icon [img]="CalendarIcon" class="text-warning" size="16"></lucide-icon> Événements
       </button>
     </div>
@@ -54,17 +50,19 @@
           <img [src]="item.imageUrl" class="w-100 h-100 object-fit-cover" [alt]="item.title">
 
           <span class="position-absolute top-0 start-0 m-3 badge rounded-pill px-3 py-2 fw-500 shadow-sm"
-            [ngClass]="getCategoryTheme(item.type).badge">
-            <ng-container *ngIf="item.type === 'Scholarship'">
+            [ngClass]="getCategoryTheme(item.opportuniteType).badge">
+            
+            <ng-container *ngIf="item.opportuniteType === 'Scholarship'">
               <lucide-icon [img]="ScholarshipIcon" size="14" class="me-1"></lucide-icon>
             </ng-container>
-            <ng-container *ngIf="item.type === 'Training'">
+            <ng-container *ngIf="item.opportuniteType === 'Training'">
               <lucide-icon [img]="TrainingIcon" size="14" class="me-1"></lucide-icon>
             </ng-container>
-            <ng-container *ngIf="item.type === 'Event'">
+            <ng-container *ngIf="item.opportuniteType === 'Event'">
               <lucide-icon [img]="CalendarIcon" size="14" class="me-1"></lucide-icon>
             </ng-container>
-            {{ translateType(item.type) }}
+            
+            {{ translateType(item.opportuniteType) }}
           </span>
 
           <div *ngIf="item.deadline"
@@ -78,8 +76,10 @@
 
           <div class="mb-3 small text-secondary d-flex align-items-center gap-2">
             <span class="fw-bold text-dark">{{ item.organization }}</span> •
+            
             <span class="d-flex align-items-center gap-1">
-              <lucide-icon [img]="MapPinIcon" size="12"></lucide-icon> {{ item.location }}
+              <lucide-icon [img]="MapPinIcon" size="12"></lucide-icon> 
+              {{ item.venue ? item.venue + ', ' : '' }}{{ item.location }}
             </span>
           </div>
 
@@ -90,7 +90,7 @@
 
           <button [routerLink]="['/details', item.id]"
             class="btn w-100 fw-bold py-2 rounded-3 border-0 transition-btn"
-            [ngClass]="getCategoryTheme(item.type).btn">
+            [ngClass]="getCategoryTheme(item.opportuniteType).btn">
             Voir les détails
           </button>
         </div>
@@ -99,7 +99,7 @@
   </div>
 
   <div class="text-center mb-5">
-    <a routerLink="/events"
+    <a routerLink="/scholarships"
       class="text-secondary text-decoration-none small d-flex align-items-center justify-content-center gap-1 hover-primary">
       Voir plus d'opportunités <lucide-icon [img]="ArrowRightIcon" size="14"></lucide-icon>
     </a>

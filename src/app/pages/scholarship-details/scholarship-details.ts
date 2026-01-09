@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // AJOUT: ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { OpportunityService } from '../../services/opportunity';
+
+// Correction des imports (ajout de .service et .component)
+import { OpportunityService } from '../../services/opportunity'; 
 import { Opportunity } from '../../models/opportunity';
 
 import { DetailContentComponent } from '../../components/detail-content/detail-content';
@@ -18,10 +20,8 @@ export class ScholarshipDetailsComponent implements OnInit {
   
   opportunity?: Opportunity;
   
-  // LISTE 1 : Pour le bas de page (Même type)
+  // Listes pour l'affichage
   relatedOpportunities: Opportunity[] = []; 
-
-  // LISTE 2 : Pour la Sidebar (Types différents : Event, Scholarship...)
   sidebarOpportunities: Opportunity[] = []; 
   
   sectionTitle: string = 'ScholarHub'; 
@@ -29,54 +29,62 @@ export class ScholarshipDetailsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private opportunityService: OpportunityService
+    private opportunityService: OpportunityService,
+    private cdr: ChangeDetectorRef // AJOUT: Injection pour forcer l'affichage
   ) {}
 
   ngOnInit(): void {
+    // paramMap détecte automatiquement si l'ID change dans l'URL (ex: passer de details/1 à details/2)
     this.route.paramMap.subscribe(params => {
-      const idString = params.get('id');
-      if (idString) {
-        const id = Number(idString);
-        this.loadData(id);
+      const id = params.get('id');
+      
+      if (id) {
+        this.loadData(id); 
         window.scrollTo(0, 0); 
       }
     });
   }
 
-  loadData(currentId: number): void {
-    this.opportunityService.getOpportunities().subscribe(allData => {
-      
-      this.opportunity = allData.find(op => op.id === currentId);
-
-      if (this.opportunity) {
+  loadData(currentId: string): void {
+    this.opportunityService.getOpportunities().subscribe({
+      next: (allData) => {
         
-        // Configuration Titre (Bas de page)
-        if (this.opportunity.type === 'Training') {
-          this.sectionTitle = 'Trainings';
-          this.listLink = '/trainings';
-        } else if (this.opportunity.type === 'Event') {
-          this.sectionTitle = 'Events';
-          this.listLink = '/events';
-        } else {
-          this.sectionTitle = 'Scholarships';
-          this.listLink = '/scholarships';
+        // 1. Trouver l'élément (Comparaison String vs String pour sécurité)
+        this.opportunity = allData.find(op => String(op.id) === currentId);
+
+        if (this.opportunity) {
+          
+          // Configuration du Titre et Lien retour
+          // Utilisation de opportuniteType (nouvelle propriété)
+          if (this.opportunity.opportuniteType === 'Training') {
+            this.sectionTitle = 'Trainings';
+            this.listLink = '/trainings';
+          } else if (this.opportunity.opportuniteType === 'Event') {
+            this.sectionTitle = 'Events';
+            this.listLink = '/events';
+          } else {
+            this.sectionTitle = 'Scholarships';
+            this.listLink = '/scholarships';
+          }
+
+          // --- LOGIQUE 1 : Bas de page (MÊME TYPE) ---
+          this.relatedOpportunities = allData.filter(item => 
+              String(item.id) !== currentId && // Exclure l'élément actuel
+              item.opportuniteType === this.opportunity!.opportuniteType
+          ).slice(0, 4);
+
+          // --- LOGIQUE 2 : Sidebar (TYPES DIFFÉRENTS) ---
+          this.sidebarOpportunities = allData.filter(item => 
+              String(item.id) !== currentId && 
+              item.opportuniteType !== this.opportunity!.opportuniteType 
+          ).slice(0, 5); 
+          
+          // IMPORTANT : Force la mise à jour de l'interface
+          this.cdr.detectChanges();
         }
-
-        // ---------------------------------------------------------
-        // LOGIQUE 1 : Bas de page (MÊME TYPE) - "More from Trainings"
-        // ---------------------------------------------------------
-        this.relatedOpportunities = allData.filter(item => 
-            item.id !== currentId && 
-            item.type === this.opportunity!.type
-        ).slice(0, 4);
-
-        // ---------------------------------------------------------
-        // LOGIQUE 2 : Sidebar (TYPES DIFFÉRENTS) - "Similar Opportunities"
-        // ---------------------------------------------------------
-        this.sidebarOpportunities = allData.filter(item => 
-            item.id !== currentId && 
-            item.type !== this.opportunity!.type // <--- NOTEZ LE !== (DIFFÉRENT)
-        ).slice(0, 5); // On en prend 5 au hasard parmi les autres types
+      },
+      error: (err) => {
+        console.error("Erreur chargement détails:", err);
       }
     });
   }

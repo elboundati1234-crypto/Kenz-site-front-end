@@ -22,7 +22,7 @@
 
         <div class="d-flex flex-column gap-3 mb-4">
             
-            <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background-color: #f8fafc;" *ngIf="opportunity.type === 'Training' || opportunity.type === 'Scholarship'">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background-color: #f8fafc;" *ngIf="opportunity.opportuniteType === 'Training' || opportunity.opportuniteType === 'Scholarship'">
                 <div class="rounded-circle d-flex align-items-center justify-content-center text-primary-custom" style="width: 2.5rem; height: 2.5rem; background-color: #dbeafe;">
                     <span class="material-symbols-outlined">payments</span>
                 </div>
@@ -43,7 +43,7 @@
                 </div>
             </div>
 
-            <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background-color: #f8fafc;" *ngIf="opportunity.type === 'Event'">
+            <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background-color: #f8fafc;" *ngIf="opportunity.opportuniteType === 'Event'">
                 <div class="rounded-circle d-flex align-items-center justify-content-center text-danger" style="width: 2.5rem; height: 2.5rem; background-color: #fee2e2;">
                    <span class="material-symbols-outlined">location_on</span>
                </div>
@@ -93,8 +93,8 @@
                    </div>
                    <div>
                        <span class="d-inline-block fw-bold px-1 rounded mb-1" style="font-size: 10px; background-color: #eff6ff;" 
-                             [ngClass]="{'text-success': item.type === 'Training', 'text-primary-custom': item.type === 'Scholarship', 'text-danger': item.type === 'Event'}">
-                           {{ item.type }}
+                             [ngClass]="{'text-success': item.opportuniteType === 'Training', 'text-primary-custom': item.opportuniteType === 'Scholarship', 'text-danger': item.opportuniteType === 'Event'}">
+                           {{ item.opportuniteType }}
                        </span>
                        <h4 class="small fw-bold text-slate-900 mb-1 group-hover-text-primary lh-sm text-truncate-2">
                            {{ item.title }}

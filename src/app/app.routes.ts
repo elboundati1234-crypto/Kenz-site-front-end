@@ -5,28 +5,48 @@ import { LoginComponent } from './pages/login/login';
 import { EventsComponent } from './pages/events/events';
 import { ScholarshipsComponent } from './pages/scholarships/scholarships';
 import { ScholarshipDetailsComponent } from './pages/scholarship-details/scholarship-details';
-import { TrainingsComponent } from './pages/trainings/trainings'; 
+import { TrainingsComponent } from './pages/trainings/trainings';
 
 export const routes: Routes = [
-  // Page d'accueil (Redirige vers la liste des bourses par défaut)
-   { path: '', redirectTo: 'home', pathMatch: 'full' },
-   { path: 'home', component: HomeComponent },
-  
+  // Home
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  {
+    path: 'home',
+    component: HomeComponent,
+    runGuardsAndResolvers: 'always'
+  },
+
+  // Auth
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  
-  // Page : Liste des Bourses (Existante)
-  { path: 'scholarships', component: ScholarshipsComponent },
-  
-  // Page : Liste des Formations (NOUVELLE PAGE)
-  { path: 'trainings', component: TrainingsComponent },
-  
-  // Page : Liste des events (NOUVELLE PAGE)
-  { path: 'events', component: EventsComponent },
-  
-  // Page de détails dynamique (utilisée pour Bourses et Formations)
-  { path: 'details/:id', component: ScholarshipDetailsComponent },
-  
-  // Redirection de sécurité (404)
- { path: '**', redirectTo: 'home' }
+
+  // Scholarships
+  {
+    path: 'scholarships',
+    component: ScholarshipsComponent,
+    runGuardsAndResolvers: 'always'
+  },
+
+  // Trainings
+  {
+    path: 'trainings',
+    component: TrainingsComponent,
+    runGuardsAndResolvers: 'always'
+  },
+
+  // Events
+  {
+    path: 'events',
+    component: EventsComponent,
+    runGuardsAndResolvers: 'always'
+  },
+
+  // Details 
+  {
+    path: 'details/:id',
+    component: ScholarshipDetailsComponent,
+    runGuardsAndResolvers: 'always'
+  },
+
+  { path: '**', redirectTo: 'home' }
 ];

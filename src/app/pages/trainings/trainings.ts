@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router, NavigationEnd } from '@angular/router'; // AJOUT: Router imports
+import { Subscription } from 'rxjs'; // AJOUT: Subscription
+
 import { OpportunityService } from '../../services/opportunity';
 import { Opportunity } from '../../models/opportunity';
 import { Training } from '../../models/training';
@@ -9,7 +11,7 @@ import { Training } from '../../models/training';
 import { TrainingCardComponent } from '../../components/training-card/training-card';
 import { TrainingFilterComponent } from '../../components/training-filter/training-filter';
 
-// Interface pour les tags visuels
+// Interface pour les tags visuels (filtres actifs)
 interface FilterTag {
   key: string;
   label: string;
@@ -22,41 +24,85 @@ interface FilterTag {
   templateUrl: './trainings.html',
   styleUrls: ['./trainings.css']
 })
-export class TrainingsComponent implements OnInit {
+export class TrainingsComponent implements OnInit, OnDestroy {
   
   allTrainings: Training[] = [];
   filteredTrainings: Training[] = [];
   paginatedTrainings: Training[] = [];
 
   searchTerm: string = '';
+  isLoading: boolean = true; // Pour gérer l'état de chargement
 
-  // --- NOUVEAU : Variables pour Tri et Tags ---
+  // Gestion Navigation
+  private routerSubscription: Subscription | undefined;
+
+  // --- Tri et Tags ---
   sortOption: string = 'newest';
   activeTags: FilterTag[] = [];
-  activeFilters: any = {}; // Stocke l'état actuel des filtres
-  // --------------------------------------------
-
+  activeFilters: any = {}; 
+  
+  // --- Pagination ---
   currentPage: number = 1;
   itemsPerPage: number = 6;
   totalPages: number = 0;
   pagesArray: number[] = [];
 
-  constructor(private opportunityService: OpportunityService) {}
+  constructor(
+    private opportunityService: OpportunityService,
+    private router: Router, // Injection Router
+    private cdr: ChangeDetectorRef // Injection ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.opportunityService.getOpportunities().subscribe((data: Opportunity[]) => {
-      const rawData = data.filter(op => op.type === 'Training');
-      this.allTrainings = rawData.map(op => this.mapToTraining(op));
-      
-      this.filteredTrainings = [...this.allTrainings];
-      
-      // Tri initial
-      this.sortResults();
-      this.calculatePagination();
+    // 1. Chargement initial
+    this.loadData();
+
+    // 2. Écouter le rechargement (clic menu alors qu'on est déjà sur la page)
+    this.routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.loadData(); // Recharger les données
+      }
     });
   }
 
-  // --- 1. GESTION DU TRI (SORT BY) ---
+  ngOnDestroy(): void {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+  }
+
+  // --- CHARGEMENT DES DONNÉES ---
+  loadData() {
+    this.isLoading = true;
+    
+    this.opportunityService.getOpportunities().subscribe({
+      next: (data: Opportunity[]) => {
+        // 1. Filtrer les opportunités de type 'Training'
+        // ATTENTION : Utilisez bien 'opportuniteType' si vous avez changé le modèle
+        const rawData = data.filter(op => op.opportuniteType === 'Training');
+        
+        // 2. Mapper vers le modèle Training
+        this.allTrainings = rawData.map(op => this.mapToTraining(op));
+        
+        // 3. Init
+        this.filteredTrainings = [...this.allTrainings];
+        this.sortResults();
+        this.calculatePagination();
+        
+        this.isLoading = false;
+        
+        // FORCER LA MISE À JOUR DE LA VUE
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erreur chargement trainings:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // --- LOGIQUE DE TRI ---
   onSortChange() {
     this.sortResults();
     this.currentPage = 1;
@@ -64,20 +110,19 @@ export class TrainingsComponent implements OnInit {
   }
 
   sortResults() {
+    // Conversion en Number pour éviter les erreurs de soustraction sur des strings
     if (this.sortOption === 'newest') {
-      this.filteredTrainings.sort((a, b) => b.id - a.id);
+      this.filteredTrainings.sort((a, b) => Number(b.id) - Number(a.id));
     } else if (this.sortOption === 'oldest') {
-      this.filteredTrainings.sort((a, b) => a.id - b.id);
+      this.filteredTrainings.sort((a, b) => Number(a.id) - Number(b.id));
     }
   }
 
-  // --- 2. GESTION DES TAGS VISUELS ---
+  // --- LOGIQUE DES TAGS VISUELS ---
   updateActiveTags() {
     this.activeTags = [];
     const f = this.activeFilters;
 
-    // Mapping manuel : Filtres -> Tags
-    // Adaptez ces clés selon ce que votre <app-training-filter> envoie
     if (f.price === 'Free') this.activeTags.push({ key: 'price', label: 'Free Only' });
     if (f.price === 'Paid') this.activeTags.push({ key: 'price', label: 'Paid Only' });
     
@@ -91,25 +136,21 @@ export class TrainingsComponent implements OnInit {
   }
 
   removeTag(tag: FilterTag) {
-    // Si c'est un bouton radio (Prix/Format), on remet à 'All' ou null
     if (tag.key === 'price' || tag.key === 'format') {
-        this.activeFilters[tag.key] = 'All'; // ou null selon votre logique
+        this.activeFilters[tag.key] = 'All'; 
     } else {
-        // Si c'est une checkbox, on met false
         this.activeFilters[tag.key] = false;
     }
-    
-    // On réapplique les filtres
     this.applyFilters();
   }
 
   handleReset() {
     this.searchTerm = '';
-    this.activeFilters = {}; // Reset total
+    this.activeFilters = {}; 
     this.applyFilters();
   }
 
-  // --- 3. LOGIQUE DE FILTRAGE PRINCIPALE ---
+  // --- FILTRAGE PRINCIPAL ---
   handleFilterChange(filters: any) {
     this.activeFilters = filters;
     this.applyFilters();
@@ -124,43 +165,43 @@ export class TrainingsComponent implements OnInit {
 
     this.filteredTrainings = this.allTrainings.filter(t => {
       // 1. Recherche Texte
-      const matchSearch = t.title.toLowerCase().includes(this.searchTerm.toLowerCase());
+      const term = this.searchTerm.toLowerCase();
+      const matchSearch = t.title.toLowerCase().includes(term) || (t.description || '').toLowerCase().includes(term);
       
-      // 2. Filtres Sidebar (Exemple)
+      // 2. Filtre Prix
       let matchPrice = true;
       if (f.price === 'Free' && t.badgeType !== 'Free') matchPrice = false;
       if (f.price === 'Paid' && t.badgeType === 'Free') matchPrice = false;
 
+      // 3. Filtre Catégorie
       let matchCategory = true;
-      // Si au moins une catégorie est cochée, on vérifie. Sinon on affiche tout.
       const catChecked = f.development || f.design || f.business || f.data;
       if (catChecked) {
-          matchCategory = false; // On part de false et on cherche une correspondance
+          matchCategory = false; 
           if (f.development && t.category === 'Development') matchCategory = true;
           if (f.design && t.category === 'Design') matchCategory = true;
           if (f.business && t.category === 'Business') matchCategory = true;
           if (f.data && t.category === 'Data Science') matchCategory = true;
       }
 
+      // 4. Filtre Format 
       return matchSearch && matchPrice && matchCategory;
     });
 
-    // Mise à jour UI
     this.updateActiveTags();
     this.sortResults();
-    
-    // Reset Pagination
     this.currentPage = 1;
     this.calculatePagination();
   }
 
-
-  // --- PAGINATION (Inchangé) ---
+  // --- PAGINATION ---
   calculatePagination() {
     this.totalPages = Math.ceil(this.filteredTrainings.length / this.itemsPerPage);
     this.pagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    
     if (this.currentPage > this.totalPages) this.currentPage = 1;
     if (this.totalPages === 0) this.currentPage = 1;
+    
     this.updatePaginatedList();
   }
 
@@ -178,30 +219,44 @@ export class TrainingsComponent implements OnInit {
     }
   }
 
-  // --- MAPPING (Inchangé) ---
+  // --- MAPPING (SÉCURISÉ & MULTILINGUE) ---
   private mapToTraining(op: Opportunity): Training {
-    const text = (op.title + ' ' + op.description).toLowerCase();
+    const desc = op.description || '';
+    const text = (op.title + ' ' + desc).toLowerCase();
+    
+    // Logique Catégorie (Français & Anglais)
     let cat = 'General';
-    if (text.includes('code') || text.includes('stack') || text.includes('web')) cat = 'Development';
-    else if (text.includes('design') || text.includes('ux')) cat = 'Design';
-    else if (text.includes('business') || text.includes('marketing')) cat = 'Business';
-    else if (text.includes('data')) cat = 'Data Science';
+    if (text.includes('code') || text.includes('stack') || text.includes('web') || text.includes('python') || text.includes('dev') || text.includes('programmation')) {
+        cat = 'Development';
+    } else if (text.includes('design') || text.includes('ux') || text.includes('ui') || text.includes('graphisme')) {
+        cat = 'Design';
+    } else if (text.includes('business') || text.includes('marketing') || text.includes('lead') || text.includes('gestion') || text.includes('management')) {
+        cat = 'Business';
+    } else if (text.includes('data') || text.includes('analytics') || text.includes('donnée') || text.includes('ia')) {
+        cat = 'Data Science';
+    }
 
+    // Logique Badge
     let badge: 'Featured' | 'Popular' | 'Free' | undefined = undefined;
-    if (op.value?.toLowerCase().includes('free')) badge = 'Free';
-    else if (op.tags?.includes('Featured')) badge = 'Featured';
-    else if (op.tags?.includes('Popular')) badge = 'Popular';
+    const valSafe = (op.value || '').toLowerCase();
+    const tagsSafe = op.tags || [];
+
+    if (valSafe.includes('free') || valSafe === '0' || valSafe.includes('gratuit')) badge = 'Free';
+    else if (tagsSafe.includes('Featured')) badge = 'Featured';
+    else if (tagsSafe.includes('Popular')) badge = 'Popular';
+
+    const benefitsSafe = (op.benefits || '').toLowerCase();
 
     return {
-      id: op.id,
+      id: op.id as any, 
       title: op.title,
       category: cat,
       organization: op.organization,
       image: op.imageUrl,
       duration: op.duration || 'Self-paced',
-      description: op.description,
+      description: desc,
       badgeType: badge,
-      isCertified: op.benefits?.toLowerCase().includes('certified') || false
+      isCertified: benefitsSafe.includes('certified') || benefitsSafe.includes('certificat') || false
     };
   }
 }
