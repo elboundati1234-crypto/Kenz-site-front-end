@@ -37,12 +37,18 @@
             <div class="col" *ngFor="let item of relatedOpportunities">
                 <a [routerLink]="['/details', item.id]" class="text-decoration-none text-reset group d-block h-100">
                     <div class="bg-surface rounded-xl border border-slate-200 overflow-hidden shadow-sm h-100 transition-colors hover:border-primary-custom">
+                        
                         <div class="position-relative overflow-hidden" style="height: 8rem; background-color: #e2e8f0;">
-                            <img [src]="item.imageUrl" [alt]="item.title" class="w-100 h-100 object-cover transition-transform group-hover-scale"/>
+                            <img [src]="item.imageUrl" 
+                                 [alt]="item.title" 
+                                 (error)="handleImageError($event)"
+                                 class="w-100 h-100 object-cover transition-transform group-hover-scale"/>
+                            
                             <div class="position-absolute top-0 start-0 m-2 bg-white bg-opacity-90 px-2 py-1 rounded fw-bold text-uppercase text-dark" style="font-size: 10px; backdrop-filter: blur(4px);">
                                 {{ item.type }}
                             </div>
                         </div>
+
                         <div class="p-3">
                             <h3 class="fw-bold text-slate-900 mb-1 text-truncate fs-6 group-hover-text-primary">{{ item.title }}</h3>
                             <p class="small text-slate-500 mb-2" style="font-size: 0.75rem;">{{ item.organization }}</p>

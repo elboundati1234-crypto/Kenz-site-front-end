@@ -77,7 +77,10 @@
       <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden card-hover">
 
         <div class="position-relative" style="height: 200px;">
-          <img [src]="item.imageUrl" class="w-100 h-100 object-fit-cover" [alt]="item.title">
+          <img [src]="item.imageUrl" 
+               class="w-100 h-100 object-fit-cover" 
+               [alt]="item.title"
+               (error)="handleImageError($event)">
 
           <span class="position-absolute top-0 start-0 m-3 badge rounded-pill px-3 py-2 fw-500 shadow-sm"
             [ngClass]="getCategoryTheme(item.type).badge">

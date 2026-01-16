@@ -91,7 +91,6 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
     }
 
     // C. Niveau (API attend 'niveau')
-    // On priorise le niveau le plus élevé si plusieurs sont cochés, ou on adapte selon logique métier
     if (this.activeFilters.phd) apiFilters.niveau = 'Doctorat';
     else if (this.activeFilters.masters) apiFilters.niveau = 'Master';
     else if (this.activeFilters.undergrad) apiFilters.niveau = 'Licence';
@@ -104,11 +103,11 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
       next: (data: Opportunity[]) => {
         
         // 3. Mapping des résultats
-        // On récupère les données pré-filtrées par le serveur (Pays, Niveau, Texte, Date)
+        // On convertit les opportunités en bourses (avec gestion des tags du service)
         this.allScholarships = data.map(op => this.mapOpportunityToScholarship(op));
         
         // 4. Filtrage "Fin" Client-Side (Domaines d'études)
-        // Comme l'API bourses n'a pas (encore) de paramètre ?field=engineering, on le fait ici
+        // On filtre sur les tags (CS, Engineering) qui sont maintenant fournis par le Service
         this.applyClientSideDomainFilters();
 
         this.isLoading = false;
@@ -122,18 +121,18 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Cette méthode applique les filtres de "Domaine" (Engineering, Medical...) 
-  // sur les données déjà reçues de l'API.
+  // Cette méthode applique les filtres de "Domaine" sur les données reçues
   applyClientSideDomainFilters() {
     const f = this.activeFilters;
     const hasFieldFilter = f.engineering || f.medical || f.business || f.arts || f.cs;
 
     if (!hasFieldFilter) {
-      // Si aucun domaine coché, on garde tout ce que l'API a envoyé
+      // Si aucun domaine coché, on garde tout
       this.filteredScholarships = [...this.allScholarships];
     } else {
-      // Sinon, on filtre localement
+      // Sinon, on filtre localement en vérifiant les tags
       this.filteredScholarships = this.allScholarships.filter(item => {
+        // On met les tags en minuscule pour comparer
         const itemTags = item.tags ? item.tags.map(t => t.toLowerCase()) : [];
         let match = false;
         
@@ -141,15 +140,15 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
         if (f.medical && itemTags.includes('medical')) match = true;
         if (f.business && itemTags.includes('business')) match = true;
         if (f.arts && itemTags.includes('arts')) match = true;
-        if (f.cs && itemTags.includes('cs')) match = true;
+        if (f.cs && (itemTags.includes('cs') || itemTags.includes('technology'))) match = true;
         
         return match;
       });
     }
 
     this.updateActiveTags();
-    this.sortResults();       // Tri local
-    this.calculatePagination(); // Pagination locale
+    this.sortResults();       
+    this.calculatePagination();
   }
 
   // --- GESTION DES ACTIONS UTILISATEUR ---
@@ -188,10 +187,11 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
   }
 
   sortResults() {
+    // Tri basé sur l'ID (assumé chronologique) ou autre logique
     if (this.sortOption === 'newest') {
-      this.filteredScholarships.sort((a, b) => Number(b.id) - Number(a.id)); 
+      this.filteredScholarships.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0)); 
     } else if (this.sortOption === 'oldest') {
-      this.filteredScholarships.sort((a, b) => Number(a.id) - Number(b.id));
+      this.filteredScholarships.sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0));
     }
   }
 
@@ -223,7 +223,6 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
     } else {
       this.activeFilters[tag.key] = false;
     }
-    // On recharge car supprimer un tag peut nécessiter un nouvel appel API (ex: location)
     this.applyFilters();
   }
 
@@ -252,28 +251,25 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- MAPPING (Identique à avant) ---
+  // --- MAPPING ---
   private mapOpportunityToScholarship(op: Opportunity): Scholarship {
-    const fullText = (op.title + ' ' + (op.description || '')).toLowerCase();
-    const tags: string[] = [];
+    // 1. Tags : On utilise ceux fournis par le service (calculés via Filière/Titre)
+    // Plus besoin de refaire les includes(...) ici
+    const tags = op.tags || [];
 
-    // Détection de tags pour le filtrage client-side
-    if (fullText.includes('engin') || fullText.includes('ingénieur') || fullText.includes('génie')) tags.push('Engineering');
-    if (fullText.includes('med') || fullText.includes('health') || fullText.includes('sante') || fullText.includes('médecine')) tags.push('Medical');
-    if (fullText.includes('busin') || fullText.includes('mba') || fullText.includes('gestion') || fullText.includes('management')) tags.push('Business');
-    if (fullText.includes('art') || fullText.includes('design') || fullText.includes('culture') || fullText.includes('humanit')) tags.push('Arts');
-    if (fullText.includes('computer') || fullText.includes('tech') || fullText.includes('ai') || 
-        fullText.includes('informatique') || fullText.includes('web') || fullText.includes('data')) tags.push('CS');
-
+    // 2. Valeur & Badge
     const safeValue = op.value || '';
+    const isFullyFunded = safeValue.toLowerCase().includes('full') || safeValue.toLowerCase().includes('complet');
 
     return {
       id: op.id as any, 
       title: op.title,
       description: op.description || '',
       image: op.imageUrl,
-      category: (safeValue.toLowerCase().includes('full') || safeValue.toLowerCase().includes('complet')) ? 'Fully Funded' : 'Scholarship',
-      badgeColor: (safeValue.toLowerCase().includes('full') || safeValue.toLowerCase().includes('complet')) ? 'success' : 'primary',
+      
+      category: isFullyFunded ? 'Fully Funded' : 'Scholarship',
+      badgeColor: isFullyFunded ? 'success' : 'primary',
+      
       level: op.level || 'Any Level',
       location: op.location,
       deadline: op.deadline || 'Open',

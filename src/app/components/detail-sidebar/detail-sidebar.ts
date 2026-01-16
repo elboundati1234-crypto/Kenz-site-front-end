@@ -7,10 +7,15 @@ import { Opportunity } from '../../models/opportunity';
   selector: 'app-detail-sidebar',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './detail-sidebar.html',
+  templateUrl: './detail-sidebar.html', 
   styleUrls: ['./detail-sidebar.css']
 })
 export class DetailSidebarComponent {
   @Input() opportunity!: Opportunity;
-  @Input() relatedOpportunities: Opportunity[] = []; // Reçoit la liste pour l'affichage sidebar
+  @Input() relatedOpportunities: Opportunity[] = []; 
+
+  
+  handleImageError(event: any) {
+    event.target.src = 'placeholder.jpg';
+  }
 }

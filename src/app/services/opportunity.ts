@@ -8,8 +8,7 @@ import { Opportunity } from '../models/opportunity';
 })
 export class OpportunityService {
 
-  // ATTENTION : Vérifiez votre port Backend (3000 ou 5001)
-  // D'après votre demande d'API, c'était localhost:3000
+  // Vérifiez bien votre port (3000 ou 5001)
   private baseUrl = 'http://localhost:5001/api'; 
   
   private http = inject(HttpClient);
@@ -82,13 +81,10 @@ export class OpportunityService {
   }
 
   // =========================================================
-  // 2. MÉTHODES GÉNÉRALES (Legacy / Sidebar)
+  // 2. MÉTHODES GÉNÉRALES (Legacy / Sidebar / Details)
   // =========================================================
 
-  // Récupère tout (utilisé pour les pages de détails pour filtrer les related localement)
   getOpportunities(): Observable<Opportunity[]> {
-    // Note: Utilise l'endpoint général ou une concaténation si pas d'endpoint "all"
-    // Ici je suppose que /opportunites renvoie tout
     return this.http.get<any[]>(`${this.baseUrl}/opportunites`).pipe(
       map(data => {
         if (!data) return [];
@@ -106,25 +102,50 @@ export class OpportunityService {
   }
 
   // =========================================================
-  // 3. MAPPING (Backend FR -> Frontend EN)
+  // 3. MAPPING INTELLIGENT (Backend -> Frontend)
   // =========================================================
   private mapBackendToFrontend(data: any): Opportunity {
     
-    // A. Traduction du TYPE (opportuniteType -> type)
-    let mappedType: 'Scholarship' | 'Training' | 'Event' = 'Scholarship';
-    
-    // On vérifie 'opportuniteType' (nouveau seed) ou 'type' (ancien seed)
+    // A. Traduction du TYPE
     const rawType = (data.opportuniteType || data.type || '').toLowerCase();
+    let mappedType: 'Scholarship' | 'Training' | 'Event' = 'Scholarship';
     
     if (rawType.includes('bourse')) mappedType = 'Scholarship';
     else if (rawType.includes('formation')) mappedType = 'Training';
     else if (rawType.includes('evenement') || rawType.includes('événement')) mappedType = 'Event';
 
-    // B. Gestion des Dates
+    // B. Génération des TAGS (Basé sur 'filiere' et 'titre')
+    // C'est ce qui fait marcher les filtres Engineering, CS, etc.
+    const tags: string[] = [];
+    const textToCheck = (data.filiere + ' ' + data.titre + ' ' + (data.description || '')).toLowerCase();
+
+    // -- CS / Tech --
+    if (textToCheck.match(/informatique|computer|web|data|ai|intelligence|cyber|security|code|devops|robot|blockchain|vr|ar|machine|full stack|react|python|java/)) {
+        tags.push('CS'); 
+        tags.push('Technology');
+    }
+    // -- Engineering --
+    if (textToCheck.match(/engineer|ingénieur|robot|civil|mech|electr/)) {
+        tags.push('Engineering');
+    }
+    // -- Medical --
+    if (textToCheck.match(/medic|health|santé|biol|pharma/)) {
+        tags.push('Medical');
+    }
+    // -- Business --
+    if (textToCheck.match(/business|management|gestion|market|finance|econ/)) {
+        tags.push('Business');
+    }
+    // -- Arts --
+    if (textToCheck.match(/art|design|culture|history|music|ux|ui|graphisme/)) {
+        tags.push('Arts');
+    }
+
+    // C. Gestion des Dates
     const dateRef = data.dateLimite || data.dateDebut;
     const deadlineStr = dateRef ? new Date(dateRef).toLocaleDateString() : 'Open';
 
-    // C. Gestion de la Valeur / Prix
+    // D. Gestion de la Valeur / Prix
     let displayValue = 'Paid';
     if (data.montant == 0 || data.montant == '0' || data.montant === 'Free' || data.statut_financier === 'free') {
         displayValue = 'Free';
@@ -132,13 +153,17 @@ export class OpportunityService {
         displayValue = isNaN(data.montant) ? data.montant : `€${data.montant}`;
     }
 
-    // D. Description enrichie
+    // E. Image de secours
+    // Si pas d'image, on met le placeholder
+    const safeImage = (data.image && data.image.length > 5) ? data.image : 'placeholder.jpg';
+
+    // F. Description enrichie avec la filière
     const fullDescription = (data.filiere ? `[${data.filiere}] ` : '') + (data.description || '');
 
     return {
       id: data._id || data.id, 
       title: data.titre,
-      type: mappedType, // On utilise bien 'type' côté frontend
+      type: mappedType,
       
       organization: data.organisme || 'Unknown',
       orgDescription: data.orgDescription,
@@ -147,14 +172,13 @@ export class OpportunityService {
       venue: data.lieu, 
       
       updatedAt: data.createdAt ? new Date(data.createdAt).toLocaleDateString() : 'Recently',
-      imageUrl: data.image || 'assets/placeholder.jpg',
+      imageUrl: safeImage,
       logoUrl: data.logo,
       
       description: fullDescription, 
       benefits: data.benefits,
       
-      // Champs spécifiques
-      level: data.niveau_academique, // Mappé depuis le backend
+      level: data.niveau_academique,
       eligibility: data.eligibility ? [data.eligibility] : [],
       
       deadline: deadlineStr,
@@ -162,7 +186,9 @@ export class OpportunityService {
       
       duration: data.Duration || 'Variable',
       language: data.language,
-      registrationLink: data.lienSource || data.lienOrganisation || '#'
+      registrationLink: data.lienSource || data.lienOrganisation || '#',
+      
+      tags: tags // On passe les tags générés au composant
     };
   }
 

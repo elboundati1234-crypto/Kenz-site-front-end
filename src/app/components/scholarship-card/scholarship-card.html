@@ -2,7 +2,11 @@
   <div class="card h-100 bg-white border-0 shadow-sm overflow-hidden transition-hover">
       
       <div class="card-img-wrapper position-relative" style="height: 200px;">
-          <img [src]="scholarship.image" class="w-100 h-100 object-fit-cover" [alt]="scholarship.title" loading="lazy">
+          <img [src]="scholarship.image" 
+               (error)="handleImageError($event)" 
+               class="w-100 h-100 object-fit-cover" 
+               [alt]="scholarship.title" 
+               loading="lazy">
           
           <span class="badge position-absolute top-0 start-0 m-3 border shadow-sm px-3 py-2"
                 [ngClass]="'bg-' + scholarship.badgeColor + '-subtle text-' + scholarship.badgeColor + '-emphasis border-' + scholarship.badgeColor + '-subtle'">
