@@ -25,9 +25,9 @@ interface FilterTag {
 })
 export class TrainingsComponent implements OnInit, OnDestroy {
   
-  allTrainings: Training[] = [];      // Liste reçue de l'API (déjà filtrée par le serveur)
-  filteredTrainings: Training[] = []; // Liste après filtrage local (si besoin de filtres supplémentaires non gérés par API)
-  paginatedTrainings: Training[] = [];
+  allTrainings: Training[] = [];      // Données brutes
+  filteredTrainings: Training[] = []; // Données filtrées et triées
+  paginatedTrainings: Training[] = []; // Données de la page visible
   
   searchTerm: string = '';
   isLoading: boolean = true;
@@ -35,7 +35,8 @@ export class TrainingsComponent implements OnInit, OnDestroy {
   private routerSubscription: Subscription | undefined;
 
   // --- Tri et Tags ---
-  sortOption: string = 'newest';
+  // Valeur par défaut 'relevant' pour correspondre au HTML
+  sortOption: string = 'relevant'; 
   activeTags: FilterTag[] = [];
   
   // --- Pagination ---
@@ -54,10 +55,7 @@ export class TrainingsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // 1. Chargement initial
     this.loadData();
-
-    // 2. Écouter le rechargement
     this.routerSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.loadData();
@@ -71,38 +69,23 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- CHARGEMENT INTELLIGENT (API BACKEND) ---
   loadData() {
     this.isLoading = true;
     
-    // 1. Préparation des filtres pour l'API
     const apiFilters: any = {};
-
-    // A. Recherche
     if (this.searchTerm) apiFilters.search = this.searchTerm;
-
-    // B. Format (Online / In Person)
     if (this.activeFilters.format) {
-       // L'API attend 'online' ou 'inPerson'
        if (this.activeFilters.format === 'Online') apiFilters.format = 'online';
        if (this.activeFilters.format === 'In Person') apiFilters.format = 'inPerson';
     }
-
-    // C. Prix (Free / Paid)
     if (this.activeFilters.price) {
        if (this.activeFilters.price === 'Free') apiFilters.price = 'free';
        if (this.activeFilters.price === 'Paid') apiFilters.price = 'paid';
     }
 
-    // 2. Appel API (qui fait le travail de filtrage)
     this.opportunityService.getTrainings(apiFilters).subscribe({
       next: (data: Opportunity[]) => {
-        
-        // 3. Mapping vers le modèle Training
         this.allTrainings = data.map(op => this.mapToTraining(op));
-        
-        // 4. Filtrage "Fin" Client-Side (Catégories)
-        // Comme l'API formations n'a pas (encore) de paramètre ?category=dev, on le fait ici
         this.applyClientSideCategoryFilters();
         
         this.isLoading = false;
@@ -116,7 +99,6 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Cette méthode applique les filtres de "Catégorie" (Dev, Design...) sur les données reçues
   applyClientSideCategoryFilters() {
     const f = this.activeFilters;
     const catChecked = f.development || f.design || f.business || f.data;
@@ -134,16 +116,14 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     }
 
     this.updateActiveTags();
-    this.sortResults();
+    this.sortResults(); // On trie après avoir filtré
     this.calculatePagination();
   }
 
   // --- GESTION DES ACTIONS ---
 
-  // Déclenché par la Sidebar ou la Recherche
   applyFilters() {
     this.currentPage = 1;
-    // On rappelle loadData car Prix/Format/Search nécessitent un appel API
     this.loadData();
   }
 
@@ -170,14 +150,30 @@ export class TrainingsComponent implements OnInit, OnDestroy {
   }
 
   sortResults() {
+    // 1. Tri "Newest" : ID décroissant (le plus grand ID est le plus récent dans MongoDB)
     if (this.sortOption === 'newest') {
-      this.filteredTrainings.sort((a, b) => Number(b.id) - Number(a.id));
-    } else if (this.sortOption === 'oldest') {
-      this.filteredTrainings.sort((a, b) => Number(a.id) - Number(b.id));
+      this.filteredTrainings.sort((a, b) => String(b.id).localeCompare(String(a.id)));
+    } 
+    
+    // 2. Tri "Price: Low to High" : Les gratuits ('Free') d'abord
+    else if (this.sortOption === 'price_asc') {
+      this.filteredTrainings.sort((a, b) => {
+        const isAFree = a.badgeType === 'Free';
+        const isBFree = b.badgeType === 'Free';
+
+        if (isAFree && !isBFree) return -1; // A vient avant B
+        if (!isAFree && isBFree) return 1;  // B vient avant A
+        return 0; // Pas de changement
+      });
+    } 
+    
+    // 3. Tri "Most Relevant" : Par défaut (souvent ID décroissant pour voir les nouveautés)
+    else {
+        // Fallback sur le plus récent
+        this.filteredTrainings.sort((a, b) => String(b.id).localeCompare(String(a.id)));
     }
   }
 
-  // --- LOGIQUE DES TAGS VISUELS ---
   updateActiveTags() {
     this.activeTags = [];
     const f = this.activeFilters;
@@ -203,7 +199,6 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  // --- PAGINATION ---
   calculatePagination() {
     this.totalPages = Math.ceil(this.filteredTrainings.length / this.itemsPerPage);
     this.pagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
@@ -228,24 +223,21 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- MAPPING ---
   private mapToTraining(op: Opportunity): Training {
     const desc = op.description || '';
     const text = (op.title + ' ' + desc).toLowerCase();
     
-    // Logique Catégorie
     let cat = 'General';
-    if (text.includes('code') || text.includes('stack') || text.includes('web') || text.includes('python') || text.includes('dev')) {
+    if (text.includes('code') || text.includes('stack') || text.includes('web') || text.includes('python') || text.includes('dev') || text.includes('java')) {
         cat = 'Development';
     } else if (text.includes('design') || text.includes('ux') || text.includes('ui') || text.includes('graphisme')) {
         cat = 'Design';
     } else if (text.includes('business') || text.includes('marketing') || text.includes('lead') || text.includes('gestion')) {
         cat = 'Business';
-    } else if (text.includes('data') || text.includes('analytics') || text.includes('donnée') || text.includes('ia')) {
+    } else if (text.includes('data') || text.includes('analytics') || text.includes('donnée') || text.includes('ia') || text.includes('intelligence')) {
         cat = 'Data Science';
     }
 
-    // Logique Badge
     let badge: 'Featured' | 'Popular' | 'Free' | undefined = undefined;
     const valSafe = (op.value || '').toLowerCase();
     const tagsSafe = op.tags || [];

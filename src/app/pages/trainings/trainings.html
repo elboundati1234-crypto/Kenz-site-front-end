@@ -1,8 +1,11 @@
-
-<div class="hero-section d-flex align-items-center justify-content-center p-4 text-center text-white" 
-     style='background-image: linear-gradient(rgba(19, 127, 236, 0.9), rgba(16, 25, 34, 0.9)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBUahCExusFLzbr_FzQGpHCxCkuHSXURYYdh6_3aEV7ZHuBR-ClPM6x6ez69C6cOS1p_CB1e9yLRv2RvvCWL5e_Bl3ydOfGHM4HlCT1ewHrm53RjxBl1-24SsaM8X-sfc9ZcVLDdWttHfOkKh96uzQbnFWUQ1ptSuOlaOLjJogQBBfaYxL9TzBqEaogerkaeNAW7pan0ufjjWAQdmGR7W6SHG6DaGsgRDMXYm7HzUTOwHBBl6_lZDXnAU8tH7EpFhvorV5nCZxRD4-7"); min-height: 320px; background-size: cover; background-position: center;'>
+<div class="hero-section d-flex align-items-center justify-content-center p-4 text-center text-white position-relative overflow-hidden" 
+     style='min-height: 320px; background-color: #0f172a;'>
     
-    <div class="d-flex flex-column gap-4 w-100 align-items-center">
+    <div class="position-absolute top-0 start-0 w-100 h-100" 
+         style="background-image: linear-gradient(rgba(19, 127, 236, 0.9), rgba(16, 25, 34, 0.9)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuBUahCExusFLzbr_FzQGpHCxCkuHSXURYYdh6_3aEV7ZHuBR-ClPM6x6ez69C6cOS1p_CB1e9yLRv2RvvCWL5e_Bl3ydOfGHM4HlCT1ewHrm53RjxBl1-24SsaM8X-sfc9ZcVLDdWttHfOkKh96uzQbnFWUQ1ptSuOlaOLjJogQBBfaYxL9TzBqEaogerkaeNAW7pan0ufjjWAQdmGR7W6SHG6DaGsgRDMXYm7HzUTOwHBBl6_lZDXnAU8tH7EpFhvorV5nCZxRD4-7'); background-size: cover; background-position: center; z-index: 0;">
+    </div>
+    
+    <div class="d-flex flex-column gap-4 w-100 align-items-center position-relative" style="z-index: 1;">
         <div style="max-width: 720px;">
             <h1 class="display-4 fw-bold">Find the perfect training</h1>
             <p class="fs-5 opacity-75 fw-normal">Boost your career with certified courses and bootcamps.</p>
@@ -55,9 +58,9 @@
                             style="min-width: 140px; cursor: pointer;"
                             [(ngModel)]="sortOption" 
                             (change)="onSortChange()">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
                         <option value="relevant">Most Relevant</option>
+                        <option value="newest">Newest</option>
+                        <option value="price_asc">Price: Low to High</option>
                     </select>
                 </div>
             </div>
@@ -79,21 +82,21 @@
             </div>
 
             <div *ngIf="isLoading" class="text-center py-5">
-                <div class="spinner-border text-primary" role="status">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="mt-2 text-muted">Searching trainings...</p>
+                <p class="mt-3 text-secondary fw-medium">Searching trainings...</p>
             </div>
 
-            <div *ngIf="!isLoading" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            <div *ngIf="!isLoading && filteredTrainings.length === 0" class="col-12 text-center py-5 bg-light rounded-4">
+                <span class="material-symbols-outlined fs-1 text-secondary mb-3">search_off</span>
+                <p class="text-secondary fw-medium">No trainings found matching your criteria.</p>
+                <button class="btn btn-outline-primary btn-sm mt-2" (click)="handleReset()">Clear Filters</button>
+            </div>
+
+            <div *ngIf="!isLoading && filteredTrainings.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                 <div class="col" *ngFor="let item of paginatedTrainings">
                     <app-training-card [training]="item"></app-training-card>
-                </div>
-                
-                <div *ngIf="filteredTrainings.length === 0" class="col-12 text-center py-5">
-                    <span class="material-symbols-outlined fs-1 text-secondary mb-3">search_off</span>
-                    <p class="text-secondary">No trainings found matching your criteria.</p>
-                    <button class="btn btn-outline-primary btn-sm mt-2" (click)="handleReset()">Clear Filters</button>
                 </div>
             </div>
 
