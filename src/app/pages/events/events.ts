@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, NavigationEnd, RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
+
 import { Opportunity } from '../../models/opportunity';
 import { OpportunityService } from '../../services/opportunity';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-events',
@@ -12,97 +14,153 @@ import { RouterLink } from '@angular/router';
   templateUrl: './events.html',
   styleUrls: ['./events.css']
 })
-export class EventsComponent implements OnInit {
+export class EventsComponent implements OnInit, OnDestroy {
 
+  // Données
   opportunities: Opportunity[] = [];
-  filteredOpportunities: Opportunity[] = [];
+  filteredOpportunities: Opportunity[] = []; // Liste affichée
+  
+  // États
+  isLoading: boolean = true;
+  private routerSubscription: Subscription | undefined;
 
-  // Filters state
+  // Filtres
   searchTerm: string = '';
-  selectedType: string = '';
-  selectedLocation: string = '';
+  selectedLocation: string = ''; // Correspond à 'pays' dans l'API
+  selectedDate: string = '';     // Correspond à 'date' dans l'API (ex: 'thisWeek')
   selectedSort: string = 'Newest';
 
-  constructor(private opportunityService: OpportunityService) {}
+  // Variable inutilisée pour l'API Events mais gardée pour la structure
+  selectedType: string = ''; 
+
+  constructor(
+    private opportunityService: OpportunityService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.opportunityService.getOpportunities().subscribe(data => {
-      // On ne garde que les Events comme demandé précédemment
-      const eventsOnly = data.filter(op => op.type === 'Event');
-      this.opportunities = eventsOnly;
-      this.filteredOpportunities = eventsOnly;
+    // 1. Chargement initial
+    this.loadData();
+
+    // 2. Gestion du rechargement (Navigation)
+    this.routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.loadData();
+      }
     });
   }
 
-  // Méthode principale de filtrage
-  applyFilters(): void {
-    let temp = this.opportunities;
+  ngOnDestroy(): void {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+  }
 
-    // 1. Search
+  // --- CHARGEMENT VIA API ---
+  loadData(): void {
+    this.isLoading = true;
+
+    // 1. Préparation des filtres pour l'API
+    const apiFilters: any = {};
+
+    // A. Recherche
     if (this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      temp = temp.filter(item =>
-        item.title.toLowerCase().includes(term) ||
-        item.description.toLowerCase().includes(term) ||
-        item.organization.toLowerCase().includes(term)
-      );
+      apiFilters.search = this.searchTerm;
     }
 
-    // 2. Type
-    if (this.selectedType) {
-      // Note: Assure-toi que tes données ont des types qui correspondent (Workshop, Seminar, etc.)
-      // Sinon, adapte les valeurs dans le HTML
-      // temp = temp.filter(item => item.tags?.includes(this.selectedType)); 
-      // Pour l'instant on filtre sur rien car tes données n'ont pas de sous-type "Seminar", 
-      // mais la logique est là.
-    }
-
-    // 3. Location
+    // B. Location (Pays)
+    // Note : L'API attend un pays. Si 'Online', on l'envoie comme pays.
     if (this.selectedLocation) {
       if (this.selectedLocation === 'Online') {
-        temp = temp.filter(item => this.isOnline(item.location));
-      } else if (this.selectedLocation === 'In Person') {
-        temp = temp.filter(item => !this.isOnline(item.location));
+        apiFilters.pays = 'Online';
+      } else if (this.selectedLocation !== 'In Person') {
+        // Si c'est un pays spécifique (ex: Morocco) et pas juste "In Person"
+        apiFilters.pays = this.selectedLocation;
       }
+      // Si c'est juste "In Person" (sans pays), on n'envoie pas de filtre pays 
+      // pour récupérer tous les événements physiques.
     }
 
-    // 4. Sort
-    if (this.selectedSort) {
-      temp = [...temp].sort((a, b) => { 
-        const dateA = new Date(a.deadline).getTime();
-        const dateB = new Date(b.deadline).getTime();
-        return this.selectedSort === 'Newest' ? dateB - dateA : dateA - dateB;
-      });
+    // C. Date (thisWeek, nextMonth)
+    if (this.selectedDate) {
+      apiFilters.date = this.selectedDate;
     }
 
-    this.filteredOpportunities = temp;
+    // 2. Appel au Service (qui appelle /api/filters/evenements)
+    this.opportunityService.getEvents(apiFilters).subscribe({
+      next: (data) => {
+        // Le Backend renvoie déjà uniquement les 'Events' filtrés
+        this.opportunities = data;
+        this.filteredOpportunities = data;
+        
+        // 3. Tri Client-side (si l'API ne gère pas le sort)
+        this.sortResults();
+
+        this.isLoading = false;
+        this.cdr.detectChanges(); // Force l'affichage
+      },
+      error: (err) => {
+        console.error('Erreur chargement Events:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-  // Helpers pour les dropdowns Bootstrap
-  setType(type: string) {
-    this.selectedType = type;
-    this.applyFilters();
+  // --- GESTION DES FILTRES ---
+  
+  // Appelé quand l'utilisateur change un filtre ou tape dans la recherche
+  applyFilters(): void {
+    // On délègue tout au Backend via loadData
+    this.loadData();
   }
+
+  // --- HELPERS POUR L'UI ---
 
   setLocation(location: string) {
     this.selectedLocation = location;
     this.applyFilters();
   }
 
-  setSort(sort: string) {
-    this.selectedSort = sort;
+  // Nouvelle méthode pour le filtre de date
+  setDate(dateFilter: string) {
+    // Valeurs attendues par l'API: 'thisWeek', 'nextMonth', ou ''
+    this.selectedDate = dateFilter;
     this.applyFilters();
   }
 
-  isOnline(location: string): boolean {
-    return location.toLowerCase().includes('online') || location.toLowerCase().includes('remote');
+  setSort(sort: string) {
+    this.selectedSort = sort;
+    // Le tri est fait localement après réception des données
+    this.sortResults(); 
   }
 
-  // Helper pour les couleurs de badges selon le design
+  // Tri local (Client-Side)
+  sortResults() {
+    // On trie sur filteredOpportunities pour mise à jour immédiate
+    this.filteredOpportunities.sort((a, b) => { 
+      const dateA = a.deadline ? new Date(a.deadline).getTime() : 0;
+      const dateB = b.deadline ? new Date(b.deadline).getTime() : 0;
+      
+      const validDateA = isNaN(dateA) ? 0 : dateA;
+      const validDateB = isNaN(dateB) ? 0 : dateB;
+
+      if (this.selectedSort === 'Newest') {
+        return validDateB - validDateA;
+      } else {
+        return validDateA - validDateB;
+      }
+    });
+  }
+
+  // Helper visuel pour savoir si c'est en ligne (pour l'icône)
+  isOnline(location: string): boolean {
+    const loc = (location || '').toLowerCase();
+    return loc.includes('online') || loc.includes('remote') || loc.includes('zoom') || loc.includes('webinar');
+  }
+
   getBadgeClass(type: string): string {
-    // Tu peux adapter cette logique selon tes types réels
-    if (type === 'Training' || type === 'Workshop') return 'bg-success-subtle text-success border-success-subtle';
-    if (type === 'Event' || type === 'Conference') return 'bg-primary-subtle text-primary border-primary-subtle bg-opacity-75 backdrop-blur';
-    return 'bg-warning-subtle text-warning-emphasis border-warning-subtle';
+    return 'bg-warning-subtle text-dark border-warning-subtle bg-opacity-75 backdrop-blur fw-bold';
   }
 }

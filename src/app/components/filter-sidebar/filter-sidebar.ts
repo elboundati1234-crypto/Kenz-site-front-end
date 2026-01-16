@@ -9,16 +9,19 @@ import { CommonModule } from '@angular/common';
   templateUrl: './filter-sidebar.html'
 })
 export class FilterSidebarComponent {
-  // État local des filtres
+  
+  // Ces filtres correspondent à ce que ScholarshipsComponent attend
   filters = {
     engineering: false,
     medical: false,
     business: false,
     arts: false,
     cs: false,
-    undergrad: false,
-    masters: false,
-    phd: false,
+    
+    undergrad: false, // Sera mappé vers 'Licence' par le parent
+    masters: false,   // Sera mappé vers 'Master' par le parent
+    phd: false,       // Sera mappé vers 'Doctorat' par le parent
+    
     closingSoon: false,
     location: 'Any Location'
   };
@@ -34,11 +37,13 @@ export class FilterSidebarComponent {
 
   // Appelé par le lien "Reset"
   triggerReset() {
+    // Réinitialisation complète
     this.filters = {
       engineering: false, medical: false, business: false, arts: false, cs: false,
       undergrad: false, masters: false, phd: false, closingSoon: false, location: 'Any Location'
     };
-    this.reset.emit(); // Signale au parent de reset
-    this.filterChange.emit(this.filters); // Envoie l'état vide
+    
+    this.reset.emit(); // Signale au parent de faire ses propres resets (ex: search term)
+    this.filterChange.emit(this.filters); // Envoie l'état vide pour recharger la liste API
   }
 }

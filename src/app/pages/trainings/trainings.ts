@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router, NavigationEnd } from '@angular/router';
+import { Subscription } from 'rxjs';
+
 import { OpportunityService } from '../../services/opportunity';
 import { Opportunity } from '../../models/opportunity';
 import { Training } from '../../models/training';
@@ -9,7 +11,6 @@ import { Training } from '../../models/training';
 import { TrainingCardComponent } from '../../components/training-card/training-card';
 import { TrainingFilterComponent } from '../../components/training-filter/training-filter';
 
-// Interface pour les tags visuels
 interface FilterTag {
   key: string;
   label: string;
@@ -22,41 +23,146 @@ interface FilterTag {
   templateUrl: './trainings.html',
   styleUrls: ['./trainings.css']
 })
-export class TrainingsComponent implements OnInit {
+export class TrainingsComponent implements OnInit, OnDestroy {
   
-  allTrainings: Training[] = [];
-  filteredTrainings: Training[] = [];
+  allTrainings: Training[] = [];      // Liste reçue de l'API (déjà filtrée par le serveur)
+  filteredTrainings: Training[] = []; // Liste après filtrage local (si besoin de filtres supplémentaires non gérés par API)
   paginatedTrainings: Training[] = [];
-
+  
   searchTerm: string = '';
+  isLoading: boolean = true;
+  
+  private routerSubscription: Subscription | undefined;
 
-  // --- NOUVEAU : Variables pour Tri et Tags ---
+  // --- Tri et Tags ---
   sortOption: string = 'newest';
   activeTags: FilterTag[] = [];
-  activeFilters: any = {}; // Stocke l'état actuel des filtres
-  // --------------------------------------------
-
+  
+  // --- Pagination ---
   currentPage: number = 1;
   itemsPerPage: number = 6;
   totalPages: number = 0;
   pagesArray: number[] = [];
 
-  constructor(private opportunityService: OpportunityService) {}
+  // --- Filtres ---
+  activeFilters: any = {}; 
+
+  constructor(
+    private opportunityService: OpportunityService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.opportunityService.getOpportunities().subscribe((data: Opportunity[]) => {
-      const rawData = data.filter(op => op.type === 'Training');
-      this.allTrainings = rawData.map(op => this.mapToTraining(op));
-      
-      this.filteredTrainings = [...this.allTrainings];
-      
-      // Tri initial
-      this.sortResults();
-      this.calculatePagination();
+    // 1. Chargement initial
+    this.loadData();
+
+    // 2. Écouter le rechargement
+    this.routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.loadData();
+      }
     });
   }
 
-  // --- 1. GESTION DU TRI (SORT BY) ---
+  ngOnDestroy(): void {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+  }
+
+  // --- CHARGEMENT INTELLIGENT (API BACKEND) ---
+  loadData() {
+    this.isLoading = true;
+    
+    // 1. Préparation des filtres pour l'API
+    const apiFilters: any = {};
+
+    // A. Recherche
+    if (this.searchTerm) apiFilters.search = this.searchTerm;
+
+    // B. Format (Online / In Person)
+    if (this.activeFilters.format) {
+       // L'API attend 'online' ou 'inPerson'
+       if (this.activeFilters.format === 'Online') apiFilters.format = 'online';
+       if (this.activeFilters.format === 'In Person') apiFilters.format = 'inPerson';
+    }
+
+    // C. Prix (Free / Paid)
+    if (this.activeFilters.price) {
+       if (this.activeFilters.price === 'Free') apiFilters.price = 'free';
+       if (this.activeFilters.price === 'Paid') apiFilters.price = 'paid';
+    }
+
+    // 2. Appel API (qui fait le travail de filtrage)
+    this.opportunityService.getTrainings(apiFilters).subscribe({
+      next: (data: Opportunity[]) => {
+        
+        // 3. Mapping vers le modèle Training
+        this.allTrainings = data.map(op => this.mapToTraining(op));
+        
+        // 4. Filtrage "Fin" Client-Side (Catégories)
+        // Comme l'API formations n'a pas (encore) de paramètre ?category=dev, on le fait ici
+        this.applyClientSideCategoryFilters();
+        
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Erreur chargement trainings:', err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Cette méthode applique les filtres de "Catégorie" (Dev, Design...) sur les données reçues
+  applyClientSideCategoryFilters() {
+    const f = this.activeFilters;
+    const catChecked = f.development || f.design || f.business || f.data;
+
+    if (!catChecked) {
+        this.filteredTrainings = [...this.allTrainings];
+    } else {
+        this.filteredTrainings = this.allTrainings.filter(t => {
+            if (f.development && t.category === 'Development') return true;
+            if (f.design && t.category === 'Design') return true;
+            if (f.business && t.category === 'Business') return true;
+            if (f.data && t.category === 'Data Science') return true;
+            return false;
+        });
+    }
+
+    this.updateActiveTags();
+    this.sortResults();
+    this.calculatePagination();
+  }
+
+  // --- GESTION DES ACTIONS ---
+
+  // Déclenché par la Sidebar ou la Recherche
+  applyFilters() {
+    this.currentPage = 1;
+    // On rappelle loadData car Prix/Format/Search nécessitent un appel API
+    this.loadData();
+  }
+
+  handleFilterChange(newFilters: any) {
+    this.activeFilters = newFilters;
+    this.applyFilters();
+  }
+
+  onSearch() {
+    this.applyFilters();
+  }
+
+  handleReset() {
+    this.searchTerm = '';
+    this.activeFilters = {}; 
+    this.applyFilters();
+  }
+
+  // --- LOGIQUE DE TRI ---
   onSortChange() {
     this.sortResults();
     this.currentPage = 1;
@@ -65,19 +171,17 @@ export class TrainingsComponent implements OnInit {
 
   sortResults() {
     if (this.sortOption === 'newest') {
-      this.filteredTrainings.sort((a, b) => b.id - a.id);
+      this.filteredTrainings.sort((a, b) => Number(b.id) - Number(a.id));
     } else if (this.sortOption === 'oldest') {
-      this.filteredTrainings.sort((a, b) => a.id - b.id);
+      this.filteredTrainings.sort((a, b) => Number(a.id) - Number(b.id));
     }
   }
 
-  // --- 2. GESTION DES TAGS VISUELS ---
+  // --- LOGIQUE DES TAGS VISUELS ---
   updateActiveTags() {
     this.activeTags = [];
     const f = this.activeFilters;
 
-    // Mapping manuel : Filtres -> Tags
-    // Adaptez ces clés selon ce que votre <app-training-filter> envoie
     if (f.price === 'Free') this.activeTags.push({ key: 'price', label: 'Free Only' });
     if (f.price === 'Paid') this.activeTags.push({ key: 'price', label: 'Paid Only' });
     
@@ -91,76 +195,22 @@ export class TrainingsComponent implements OnInit {
   }
 
   removeTag(tag: FilterTag) {
-    // Si c'est un bouton radio (Prix/Format), on remet à 'All' ou null
     if (tag.key === 'price' || tag.key === 'format') {
-        this.activeFilters[tag.key] = 'All'; // ou null selon votre logique
+        this.activeFilters[tag.key] = 'All'; 
     } else {
-        // Si c'est une checkbox, on met false
         this.activeFilters[tag.key] = false;
     }
-    
-    // On réapplique les filtres
     this.applyFilters();
   }
 
-  handleReset() {
-    this.searchTerm = '';
-    this.activeFilters = {}; // Reset total
-    this.applyFilters();
-  }
-
-  // --- 3. LOGIQUE DE FILTRAGE PRINCIPALE ---
-  handleFilterChange(filters: any) {
-    this.activeFilters = filters;
-    this.applyFilters();
-  }
-
-  onSearch() {
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    const f = this.activeFilters;
-
-    this.filteredTrainings = this.allTrainings.filter(t => {
-      // 1. Recherche Texte
-      const matchSearch = t.title.toLowerCase().includes(this.searchTerm.toLowerCase());
-      
-      // 2. Filtres Sidebar (Exemple)
-      let matchPrice = true;
-      if (f.price === 'Free' && t.badgeType !== 'Free') matchPrice = false;
-      if (f.price === 'Paid' && t.badgeType === 'Free') matchPrice = false;
-
-      let matchCategory = true;
-      // Si au moins une catégorie est cochée, on vérifie. Sinon on affiche tout.
-      const catChecked = f.development || f.design || f.business || f.data;
-      if (catChecked) {
-          matchCategory = false; // On part de false et on cherche une correspondance
-          if (f.development && t.category === 'Development') matchCategory = true;
-          if (f.design && t.category === 'Design') matchCategory = true;
-          if (f.business && t.category === 'Business') matchCategory = true;
-          if (f.data && t.category === 'Data Science') matchCategory = true;
-      }
-
-      return matchSearch && matchPrice && matchCategory;
-    });
-
-    // Mise à jour UI
-    this.updateActiveTags();
-    this.sortResults();
-    
-    // Reset Pagination
-    this.currentPage = 1;
-    this.calculatePagination();
-  }
-
-
-  // --- PAGINATION (Inchangé) ---
+  // --- PAGINATION ---
   calculatePagination() {
     this.totalPages = Math.ceil(this.filteredTrainings.length / this.itemsPerPage);
     this.pagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    
     if (this.currentPage > this.totalPages) this.currentPage = 1;
     if (this.totalPages === 0) this.currentPage = 1;
+    
     this.updatePaginatedList();
   }
 
@@ -178,30 +228,44 @@ export class TrainingsComponent implements OnInit {
     }
   }
 
-  // --- MAPPING (Inchangé) ---
+  // --- MAPPING ---
   private mapToTraining(op: Opportunity): Training {
-    const text = (op.title + ' ' + op.description).toLowerCase();
+    const desc = op.description || '';
+    const text = (op.title + ' ' + desc).toLowerCase();
+    
+    // Logique Catégorie
     let cat = 'General';
-    if (text.includes('code') || text.includes('stack') || text.includes('web')) cat = 'Development';
-    else if (text.includes('design') || text.includes('ux')) cat = 'Design';
-    else if (text.includes('business') || text.includes('marketing')) cat = 'Business';
-    else if (text.includes('data')) cat = 'Data Science';
+    if (text.includes('code') || text.includes('stack') || text.includes('web') || text.includes('python') || text.includes('dev')) {
+        cat = 'Development';
+    } else if (text.includes('design') || text.includes('ux') || text.includes('ui') || text.includes('graphisme')) {
+        cat = 'Design';
+    } else if (text.includes('business') || text.includes('marketing') || text.includes('lead') || text.includes('gestion')) {
+        cat = 'Business';
+    } else if (text.includes('data') || text.includes('analytics') || text.includes('donnée') || text.includes('ia')) {
+        cat = 'Data Science';
+    }
 
+    // Logique Badge
     let badge: 'Featured' | 'Popular' | 'Free' | undefined = undefined;
-    if (op.value?.toLowerCase().includes('free')) badge = 'Free';
-    else if (op.tags?.includes('Featured')) badge = 'Featured';
-    else if (op.tags?.includes('Popular')) badge = 'Popular';
+    const valSafe = (op.value || '').toLowerCase();
+    const tagsSafe = op.tags || [];
+
+    if (valSafe.includes('free') || valSafe === '0' || valSafe.includes('gratuit')) badge = 'Free';
+    else if (tagsSafe.includes('Featured')) badge = 'Featured';
+    else if (tagsSafe.includes('Popular')) badge = 'Popular';
+
+    const benefitsSafe = (op.benefits || '').toLowerCase();
 
     return {
-      id: op.id,
+      id: op.id as any, 
       title: op.title,
       category: cat,
       organization: op.organization,
       image: op.imageUrl,
       duration: op.duration || 'Self-paced',
-      description: op.description,
+      description: desc,
       badgeType: badge,
-      isCertified: op.benefits?.toLowerCase().includes('certified') || false
+      isCertified: benefitsSafe.includes('certified') || benefitsSafe.includes('certificat') || false
     };
   }
 }

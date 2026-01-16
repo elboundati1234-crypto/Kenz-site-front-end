@@ -11,5 +11,5 @@ import { Scholarship } from '../../models/scholarship';
   styleUrls: ['./scholarship-card.css']
 })
 export class ScholarshipCardComponent {
-  @Input() scholarship!: Scholarship; // Reçoit la bourse du parent
+  @Input() scholarship!: Scholarship;
 }

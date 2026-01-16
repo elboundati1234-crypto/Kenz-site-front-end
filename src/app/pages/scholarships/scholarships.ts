@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, NavigationEnd } from '@angular/router'; 
+import { Subscription } from 'rxjs';
+
 import { OpportunityService } from '../../services/opportunity';
 import { Opportunity } from '../../models/opportunity';
 import { Scholarship } from '../../models/scholarship';
@@ -8,7 +11,6 @@ import { Scholarship } from '../../models/scholarship';
 import { ScholarshipCardComponent } from '../../components/scholarship-card/scholarship-card';
 import { FilterSidebarComponent } from '../../components/filter-sidebar/filter-sidebar';
 
-// Interface pour les étiquettes de filtres (Tags)
 interface FilterTag {
   key: string;
   label: string;
@@ -21,41 +23,161 @@ interface FilterTag {
   templateUrl: './scholarships.html',
   styleUrls: ['./scholarships.css']
 })
-export class ScholarshipsComponent implements OnInit {
+export class ScholarshipsComponent implements OnInit, OnDestroy {
 
-  allScholarships: Scholarship[] = [];
-  filteredScholarships: Scholarship[] = [];
-  paginatedScholarships: Scholarship[] = [];
+  // Données
+  allScholarships: Scholarship[] = [];      // Tous les résultats renvoyés par l'API
+  filteredScholarships: Scholarship[] = []; // Résultats après filtre "tags" (Engineering...)
+  paginatedScholarships: Scholarship[] = []; // Page courante
   
   searchTerm: string = '';
+  isLoading: boolean = true;
   
-  // --- NOUVEAU : Tri et Tags ---
+  private routerSubscription: Subscription | undefined;
+
+  // --- Tri et Tags ---
   sortOption: string = 'newest';
   activeTags: FilterTag[] = [];
-  // -----------------------------
-
+  
+  // --- Pagination ---
   currentPage: number = 1;
   itemsPerPage: number = 6;
   totalPages: number = 0;
   pagesArray: number[] = [];
 
+  // --- Filtres ---
   activeFilters: any = {
     engineering: false, medical: false, business: false, arts: false, cs: false,
     undergrad: false, masters: false, phd: false, closingSoon: false, location: 'Any Location'
   };
 
-  constructor(private opportunityService: OpportunityService) {}
+  constructor(
+    private opportunityService: OpportunityService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
-    this.opportunityService.getOpportunities().subscribe((opportunities: Opportunity[]) => {
-      this.allScholarships = opportunities
-        .filter(op => op.type === 'Scholarship')
-        .map(op => this.mapOpportunityToScholarship(op));
-      
-      this.filteredScholarships = [...this.allScholarships];
-      this.sortResults(); // Tri initial
-      this.calculatePagination();
+    // 1. Chargement initial
+    this.loadData();
+
+    // 2. Gestion du rechargement via Router
+    this.routerSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.loadData();
+      }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
+    }
+  }
+
+  // --- CHARGEMENT INTELLIGENT (API + FILTRES) ---
+  loadData() {
+    this.isLoading = true;
+
+    // 1. Préparation des filtres pour l'API
+    const apiFilters: any = {};
+
+    // A. Recherche Texte
+    if (this.searchTerm) apiFilters.search = this.searchTerm;
+
+    // B. Localisation
+    if (this.activeFilters.location && this.activeFilters.location !== 'Any Location') {
+      apiFilters.pays = this.activeFilters.location;
+    }
+
+    // C. Niveau (API attend 'niveau')
+    // On priorise le niveau le plus élevé si plusieurs sont cochés, ou on adapte selon logique métier
+    if (this.activeFilters.phd) apiFilters.niveau = 'Doctorat';
+    else if (this.activeFilters.masters) apiFilters.niveau = 'Master';
+    else if (this.activeFilters.undergrad) apiFilters.niveau = 'Licence';
+
+    // D. Closing Soon
+    if (this.activeFilters.closingSoon) apiFilters.closingSoon = true;
+
+    // 2. Appel API
+    this.opportunityService.getScholarships(apiFilters).subscribe({
+      next: (data: Opportunity[]) => {
+        
+        // 3. Mapping des résultats
+        // On récupère les données pré-filtrées par le serveur (Pays, Niveau, Texte, Date)
+        this.allScholarships = data.map(op => this.mapOpportunityToScholarship(op));
+        
+        // 4. Filtrage "Fin" Client-Side (Domaines d'études)
+        // Comme l'API bourses n'a pas (encore) de paramètre ?field=engineering, on le fait ici
+        this.applyClientSideDomainFilters();
+
+        this.isLoading = false;
+        this.cdr.detectChanges(); // Force l'affichage
+      },
+      error: (err) => {
+        console.error("Erreur chargement Bourses:", err);
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // Cette méthode applique les filtres de "Domaine" (Engineering, Medical...) 
+  // sur les données déjà reçues de l'API.
+  applyClientSideDomainFilters() {
+    const f = this.activeFilters;
+    const hasFieldFilter = f.engineering || f.medical || f.business || f.arts || f.cs;
+
+    if (!hasFieldFilter) {
+      // Si aucun domaine coché, on garde tout ce que l'API a envoyé
+      this.filteredScholarships = [...this.allScholarships];
+    } else {
+      // Sinon, on filtre localement
+      this.filteredScholarships = this.allScholarships.filter(item => {
+        const itemTags = item.tags ? item.tags.map(t => t.toLowerCase()) : [];
+        let match = false;
+        
+        if (f.engineering && itemTags.includes('engineering')) match = true;
+        if (f.medical && itemTags.includes('medical')) match = true;
+        if (f.business && itemTags.includes('business')) match = true;
+        if (f.arts && itemTags.includes('arts')) match = true;
+        if (f.cs && itemTags.includes('cs')) match = true;
+        
+        return match;
+      });
+    }
+
+    this.updateActiveTags();
+    this.sortResults();       // Tri local
+    this.calculatePagination(); // Pagination locale
+  }
+
+  // --- GESTION DES ACTIONS UTILISATEUR ---
+
+  // Déclenché par la Sidebar ou la Recherche
+  applyFilters() {
+    this.currentPage = 1;
+    // On rappelle loadData car certains filtres (Pays, Niveau) nécessitent un appel API
+    this.loadData(); 
+  }
+
+  handleFilterChange(newFilters: any) {
+    this.activeFilters = newFilters;
+    this.applyFilters();
+  }
+
+  onSearch() {
+    this.applyFilters();
+  }
+
+  handleReset() {
+    this.searchTerm = '';
+    // Reset des filtres actifs
+    this.activeFilters = {
+        engineering: false, medical: false, business: false, arts: false, cs: false,
+        undergrad: false, masters: false, phd: false, closingSoon: false, location: 'Any Location'
+    };
+    this.applyFilters();
   }
 
   // --- LOGIQUE DE TRI ---
@@ -67,14 +189,13 @@ export class ScholarshipsComponent implements OnInit {
 
   sortResults() {
     if (this.sortOption === 'newest') {
-      // Tri par ID décroissant (simule le plus récent)
-      this.filteredScholarships.sort((a, b) => b.id - a.id); 
+      this.filteredScholarships.sort((a, b) => Number(b.id) - Number(a.id)); 
     } else if (this.sortOption === 'oldest') {
-      this.filteredScholarships.sort((a, b) => a.id - b.id);
+      this.filteredScholarships.sort((a, b) => Number(a.id) - Number(b.id));
     }
   }
 
-  // --- LOGIQUE DES TAGS (FILTRES VISUELS) ---
+  // --- LOGIQUE DES TAGS VISUELS ---
   updateActiveTags() {
     this.activeTags = [];
     const f = this.activeFilters;
@@ -102,86 +223,18 @@ export class ScholarshipsComponent implements OnInit {
     } else {
       this.activeFilters[tag.key] = false;
     }
+    // On recharge car supprimer un tag peut nécessiter un nouvel appel API (ex: location)
     this.applyFilters();
   }
 
-  // --- LOGIQUE PRINCIPALE ---
-  handleFilterChange(newFilters: any) {
-    this.activeFilters = newFilters;
-    this.applyFilters();
-  }
-
-  onSearch() {
-    this.applyFilters();
-  }
-
-  handleReset() {
-    this.searchTerm = '';
-    // Reset manuel des filtres si nécessaire (dépend de votre sidebar)
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    this.filteredScholarships = this.allScholarships.filter(item => {
-      // 1. Recherche Texte
-      const term = this.searchTerm.toLowerCase();
-      const matchesSearch = item.title.toLowerCase().includes(term) || item.description?.toLowerCase().includes(term);
-      if (!matchesSearch) return false;
-
-      // 2. Filtres Sidebar
-      const f = this.activeFilters;
-      const itemTags = item.tags ? item.tags.map(t => t.toLowerCase()) : [];
-      
-      const hasFieldFilter = f.engineering || f.medical || f.business || f.arts || f.cs;
-      if (hasFieldFilter) {
-        let match = false;
-        if (f.engineering && itemTags.includes('engineering')) match = true;
-        if (f.medical && itemTags.includes('medical')) match = true;
-        if (f.business && itemTags.includes('business')) match = true;
-        if (f.arts && itemTags.includes('arts')) match = true;
-        if (f.cs && itemTags.includes('cs')) match = true;
-        if (!match) return false;
-      }
-
-      // 3. Level
-      const hasLevelFilter = f.undergrad || f.masters || f.phd;
-      if (hasLevelFilter) {
-        const level = item.level.toLowerCase();
-        let match = false;
-        if (f.undergrad && (level.includes('undergrad') || level.includes('bachelor'))) match = true;
-        if (f.masters && (level.includes("master") || (level.includes('graduate') && !level.includes('under')))) match = true;
-        if (f.phd && (level.includes('phd') || level.includes('doctorate'))) match = true;
-        if (!match) return false;
-      }
-
-      // 4. Closing Soon
-      if (f.closingSoon) {
-        const isSoon = item.deadline.includes('Oct') || item.deadline.includes('Nov') || item.deadline.includes('Dec');
-        if (!isSoon) return false;
-      }
-
-      // 5. Location
-      if (f.location && f.location !== 'Any Location' && !item.location.toLowerCase().includes(f.location.toLowerCase())) {
-        return false;
-      }
-
-      return true;
-    });
-
-    // Mise à jour des Tags et du Tri
-    this.updateActiveTags();
-    this.sortResults();
-
-    this.currentPage = 1;
-    this.calculatePagination();
-  }
-
-  // --- PAGINATION (Code existant) ---
+  // --- PAGINATION ---
   calculatePagination() {
     this.totalPages = Math.ceil(this.filteredScholarships.length / this.itemsPerPage);
     this.pagesArray = Array.from({ length: this.totalPages }, (_, i) => i + 1);
+    
     if (this.currentPage > this.totalPages) this.currentPage = 1;
     if (this.totalPages === 0) this.currentPage = 1;
+    
     this.updatePaginatedList();
   }
 
@@ -199,26 +252,32 @@ export class ScholarshipsComponent implements OnInit {
     }
   }
 
+  // --- MAPPING (Identique à avant) ---
   private mapOpportunityToScholarship(op: Opportunity): Scholarship {
-    const fullText = (op.title + ' ' + op.description).toLowerCase();
+    const fullText = (op.title + ' ' + (op.description || '')).toLowerCase();
     const tags: string[] = [];
-    if (fullText.includes('engin')) tags.push('Engineering');
-    if (fullText.includes('med') || fullText.includes('health')) tags.push('Medical');
-    if (fullText.includes('busin') || fullText.includes('mba')) tags.push('Business');
-    if (fullText.includes('art') || fullText.includes('humanit')) tags.push('Arts');
-    if (fullText.includes('computer') || fullText.includes('tech') || fullText.includes('ai')) tags.push('CS');
+
+    // Détection de tags pour le filtrage client-side
+    if (fullText.includes('engin') || fullText.includes('ingénieur') || fullText.includes('génie')) tags.push('Engineering');
+    if (fullText.includes('med') || fullText.includes('health') || fullText.includes('sante') || fullText.includes('médecine')) tags.push('Medical');
+    if (fullText.includes('busin') || fullText.includes('mba') || fullText.includes('gestion') || fullText.includes('management')) tags.push('Business');
+    if (fullText.includes('art') || fullText.includes('design') || fullText.includes('culture') || fullText.includes('humanit')) tags.push('Arts');
+    if (fullText.includes('computer') || fullText.includes('tech') || fullText.includes('ai') || 
+        fullText.includes('informatique') || fullText.includes('web') || fullText.includes('data')) tags.push('CS');
+
+    const safeValue = op.value || '';
 
     return {
-      id: op.id,
+      id: op.id as any, 
       title: op.title,
-      description: op.description,
+      description: op.description || '',
       image: op.imageUrl,
-      category: op.value.includes('Full') ? 'Fully Funded' : 'Scholarship',
-      badgeColor: op.value.includes('Full') ? 'success' : 'primary',
+      category: (safeValue.toLowerCase().includes('full') || safeValue.toLowerCase().includes('complet')) ? 'Fully Funded' : 'Scholarship',
+      badgeColor: (safeValue.toLowerCase().includes('full') || safeValue.toLowerCase().includes('complet')) ? 'success' : 'primary',
       level: op.level || 'Any Level',
       location: op.location,
-      deadline: op.deadline,
-      amount: op.value,
+      deadline: op.deadline || 'Open',
+      amount: safeValue || 'N/A',
       tags: tags
     };
   }

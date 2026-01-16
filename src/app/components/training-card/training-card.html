@@ -1,9 +1,9 @@
-<div class="card h-100 rounded-3 overflow-hidden border shadow-sm">
-    <div class="card-img-wrapper position-relative">
-        <img [src]="training.image" class="card-img-top" [alt]="training.title" loading="lazy">
+<div class="card h-100 rounded-4 overflow-hidden border-0 shadow-sm transition-hover">
+    <div class="card-img-wrapper position-relative" style="height: 200px;">
+        <img [src]="training.image" class="w-100 h-100 object-fit-cover" [alt]="training.title" loading="lazy">
         
         <div *ngIf="training.badgeType" 
-             class="position-absolute m-3 badge fw-bold shadow-sm d-flex align-items-center gap-1"
+             class="position-absolute m-3 badge fw-bold shadow-sm d-flex align-items-center gap-1 px-3 py-2"
              [ngClass]="getBadgeClass()"
              [style.top]="'0'"
              [style.left]="training.badgeType !== 'Popular' ? '0' : 'auto'"
@@ -18,17 +18,19 @@
             <span class="badge rounded px-2 py-1 fw-medium" [ngClass]="getCategoryClass()">
                 {{ training.category }}
             </span>
-            <span *ngIf="training.isCertified" class="badge bg-success-subtle text-success rounded px-2 py-1 fw-medium">Certified</span>
+            <span *ngIf="training.isCertified" class="badge bg-light text-secondary border rounded px-2 py-1 fw-medium d-flex align-items-center gap-1">
+                <span class="material-symbols-outlined" style="font-size: 12px;">verified</span> Certified
+            </span>
         </div>
         
-        <h5 class="card-title fw-bold lh-sm mb-2 fs-6 text-dark">{{ training.title }}</h5>
+        <h5 class="card-title fw-bold lh-sm mb-2 fs-6 text-dark text-truncate-2">{{ training.title }}</h5>
         
         <div class="d-flex align-items-center gap-2 mb-3 small text-secondary">
             <span class="material-symbols-outlined fs-6">school</span>
-            <span>{{ training.organization }}</span>
+            <span class="fw-medium">{{ training.organization }}</span>
         </div>
         
-        <p class="card-text small text-secondary text-truncate-2 mb-4">
+        <p class="card-text small text-secondary text-truncate-2 mb-4 flex-grow-1">
             {{ training.description || 'No description available.' }}
         </p>
         
@@ -39,8 +41,7 @@
             </div>
             
             <a [routerLink]="['/details', training.id]" 
-               class="text-primary fw-bold small text-decoration-none d-flex align-items-center gap-1 link-hover"
-               style="color: var(--bs-primary) !important;">
+               class="text-primary fw-bold small text-decoration-none d-flex align-items-center gap-1 hover-primary">
                 View Details 
                 <span class="material-symbols-outlined fs-6">arrow_forward</span>
             </a>
