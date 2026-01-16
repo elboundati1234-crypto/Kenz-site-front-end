@@ -68,7 +68,7 @@ export class OpportunityService {
     return {
       id: data._id || data.id, 
       title: data.titre,
-      type: mappedType, // Le type est maintenant en Anglais !
+      type: mappedType, 
       
       organization: data.organisme || 'Unknown',
       orgDescription: data.orgDescription,
