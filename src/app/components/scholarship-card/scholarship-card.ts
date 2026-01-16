@@ -12,4 +12,11 @@ import { Scholarship } from '../../models/scholarship';
 })
 export class ScholarshipCardComponent {
   @Input() scholarship!: Scholarship;
+
+  // Cette fonction remplace l'image par défaut si le lien du backend est mort
+  handleImageError(event: any) {
+    // Comme votre image est dans 'public/placeholder.jpg', 
+    // l'URL finale est juste 'placeholder.jpg'
+    event.target.src = 'placeholder.jpg';
+  }
 }

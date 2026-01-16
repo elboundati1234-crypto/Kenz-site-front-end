@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterModule, Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subscription, forkJoin } from 'rxjs'; // AJOUT: forkJoin
+import { Subscription, forkJoin } from 'rxjs'; 
 import { 
   LucideAngularModule, 
   Search, 
@@ -68,27 +68,30 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
+  // --- GESTION DES IMAGES CASSÉES ---
+  handleImageError(event: any) {
+    // Utilise l'image placeholder.jpg située dans votre dossier public
+    event.target.src = 'placeholder.jpg';
+  }
+
   // --- LOGIQUE DE CHARGEMENT ---
   loadData() {
     this.isLoading = true;
     this.opportunities = []; 
 
-    // 1. RECHERCHE (Prioritaire)
     if (this.searchTerm.trim()) {
       this.opportunityService.searchGlobal(this.searchTerm).subscribe({
         next: (data) => {
-          this.opportunities = data.slice(0, 6); // Max 6 résultats de recherche
+          this.opportunities = data.slice(0, 6);
           this.isLoading = false;
           this.cdr.detectChanges();
         },
         error: (err) => this.handleError(err)
       });
-      return; // On arrête ici si recherche
+      return;
     } 
 
-    // 2. FILTRES PAR CATÉGORIE
     switch (this.activeCategory) {
-      
       case 'Scholarship':
         this.opportunityService.getScholarships({}).subscribe({
           next: (data) => this.handleSimpleResponse(data),
@@ -110,31 +113,19 @@ export class HomeComponent implements OnInit, OnDestroy {
         });
         break;
 
-      // CAS "TOUT VOIR" : MIX 2 + 2 + 2
       case 'All':
       default:
-        // On lance les 3 requêtes en parallèle
         forkJoin({
           scholarships: this.opportunityService.getScholarships({}),
           trainings: this.opportunityService.getTrainings({}),
           events: this.opportunityService.getEvents({})
         }).subscribe({
           next: (results) => {
-            // On prend les 2 premiers de chaque tableau
             const topScholarships = results.scholarships.slice(0, 2);
             const topTrainings = results.trainings.slice(0, 2);
             const topEvents = results.events.slice(0, 2);
 
-            // On combine le tout (Total = 6 items max)
-            this.opportunities = [
-              ...topScholarships, 
-              ...topTrainings, 
-              ...topEvents
-            ];
-
-            // Optionnel: Trier par date (newest) pour mélanger un peu l'affichage
-            // this.opportunities.sort((a, b) => Number(b.id) - Number(a.id));
-
+            this.opportunities = [...topScholarships, ...topTrainings, ...topEvents];
             this.isLoading = false;
             this.cdr.detectChanges();
           },
@@ -144,7 +135,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Helper pour les cas simples (une seule catégorie)
   private handleSimpleResponse(data: Opportunity[]) {
     this.opportunities = data.slice(0, 6);
     this.isLoading = false;
@@ -157,7 +147,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  // --- ACTIONS ---
   onSearch() {
     this.activeCategory = 'All';
     this.loadData();
@@ -169,7 +158,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
-  // --- HELPERS VISUELS ---
   getCategoryTheme(type: string): { badge: string, btn: string, icon: string } {
     switch(type) {
       case 'Scholarship': 

@@ -13,27 +13,32 @@ import { Training } from '../../models/training';
 export class TrainingCardComponent {
   @Input() training!: Training;
 
+  
+  handleImageError(event: any) {
+    event.target.src = 'placeholder.jpg';
+  }
+
   // Détermine la couleur du tag en haut de la carte
   getCategoryClass(): string {
     if (!this.training.category) return 'bg-light text-secondary';
     
     switch (this.training.category) {
       case 'Development': 
-        return 'bg-primary-subtle text-primary'; // Bleu
+        return 'bg-primary-subtle text-primary'; 
       case 'Design': 
-        return 'bg-info-subtle text-info-emphasis'; // Cyan
+        return 'bg-info-subtle text-info-emphasis'; 
       case 'Business': 
-        return 'bg-warning-subtle text-warning-emphasis'; // Jaune/Orange
+        return 'bg-warning-subtle text-warning-emphasis'; 
       case 'Data Science': 
-        return 'bg-success-subtle text-success'; // Vert (ou Purple si vous avez du CSS custom)
+        return 'bg-success-subtle text-success'; 
       case 'Marketing': 
-        return 'bg-danger-subtle text-danger-emphasis'; // Rouge
+        return 'bg-danger-subtle text-danger-emphasis'; 
       default: 
         return 'bg-light text-secondary';
     }
   }
 
-  // Détermine le style visuel du badge (Featured, Popular, Free)
+  // Détermine le style visuel du badge
   getBadgeClass(): string {
     switch (this.training.badgeType) {
       case 'Featured': 

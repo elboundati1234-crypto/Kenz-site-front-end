@@ -56,7 +56,11 @@ export class EventsComponent implements OnInit, OnDestroy {
       this.routerSubscription.unsubscribe();
     }
   }
-
+// --- GESTION DES IMAGES CASSÉES ---
+  handleImageError(event: any) {
+    // Utilise l'image placeholder.jpg située dans votre dossier public
+    event.target.src = 'placeholder.jpg';
+  }
   // --- CHARGEMENT VIA API ---
   loadData(): void {
     this.isLoading = true;
