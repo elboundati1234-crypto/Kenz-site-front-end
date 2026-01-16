@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, Router, NavigationEnd } from '@angular/router'; // AJOUT: Router imports
-import { Subscription } from 'rxjs'; // AJOUT: Subscription
+import { RouterLink, Router, NavigationEnd } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { OpportunityService } from '../../services/opportunity';
 import { Opportunity } from '../../models/opportunity';
@@ -11,7 +11,6 @@ import { Training } from '../../models/training';
 import { TrainingCardComponent } from '../../components/training-card/training-card';
 import { TrainingFilterComponent } from '../../components/training-filter/training-filter';
 
-// Interface pour les tags visuels (filtres actifs)
 interface FilterTag {
   key: string;
   label: string;
@@ -26,20 +25,18 @@ interface FilterTag {
 })
 export class TrainingsComponent implements OnInit, OnDestroy {
   
-  allTrainings: Training[] = [];
-  filteredTrainings: Training[] = [];
+  allTrainings: Training[] = [];      // Liste reçue de l'API (déjà filtrée par le serveur)
+  filteredTrainings: Training[] = []; // Liste après filtrage local (si besoin de filtres supplémentaires non gérés par API)
   paginatedTrainings: Training[] = [];
-
+  
   searchTerm: string = '';
-  isLoading: boolean = true; // Pour gérer l'état de chargement
-
-  // Gestion Navigation
+  isLoading: boolean = true;
+  
   private routerSubscription: Subscription | undefined;
 
   // --- Tri et Tags ---
   sortOption: string = 'newest';
   activeTags: FilterTag[] = [];
-  activeFilters: any = {}; 
   
   // --- Pagination ---
   currentPage: number = 1;
@@ -47,20 +44,23 @@ export class TrainingsComponent implements OnInit, OnDestroy {
   totalPages: number = 0;
   pagesArray: number[] = [];
 
+  // --- Filtres ---
+  activeFilters: any = {}; 
+
   constructor(
     private opportunityService: OpportunityService,
-    private router: Router, // Injection Router
-    private cdr: ChangeDetectorRef // Injection ChangeDetectorRef
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     // 1. Chargement initial
     this.loadData();
 
-    // 2. Écouter le rechargement (clic menu alors qu'on est déjà sur la page)
+    // 2. Écouter le rechargement
     this.routerSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.loadData(); // Recharger les données
+        this.loadData();
       }
     });
   }
@@ -71,27 +71,41 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- CHARGEMENT DES DONNÉES ---
+  // --- CHARGEMENT INTELLIGENT (API BACKEND) ---
   loadData() {
     this.isLoading = true;
     
-    this.opportunityService.getOpportunities().subscribe({
+    // 1. Préparation des filtres pour l'API
+    const apiFilters: any = {};
+
+    // A. Recherche
+    if (this.searchTerm) apiFilters.search = this.searchTerm;
+
+    // B. Format (Online / In Person)
+    if (this.activeFilters.format) {
+       // L'API attend 'online' ou 'inPerson'
+       if (this.activeFilters.format === 'Online') apiFilters.format = 'online';
+       if (this.activeFilters.format === 'In Person') apiFilters.format = 'inPerson';
+    }
+
+    // C. Prix (Free / Paid)
+    if (this.activeFilters.price) {
+       if (this.activeFilters.price === 'Free') apiFilters.price = 'free';
+       if (this.activeFilters.price === 'Paid') apiFilters.price = 'paid';
+    }
+
+    // 2. Appel API (qui fait le travail de filtrage)
+    this.opportunityService.getTrainings(apiFilters).subscribe({
       next: (data: Opportunity[]) => {
-        // 1. Filtrer les opportunités de type 'Training'
-        // ATTENTION : Utilisez bien 'type' si vous avez changé le modèle
-        const rawData = data.filter(op => op.type === 'Training');
         
-        // 2. Mapper vers le modèle Training
-        this.allTrainings = rawData.map(op => this.mapToTraining(op));
+        // 3. Mapping vers le modèle Training
+        this.allTrainings = data.map(op => this.mapToTraining(op));
         
-        // 3. Init
-        this.filteredTrainings = [...this.allTrainings];
-        this.sortResults();
-        this.calculatePagination();
+        // 4. Filtrage "Fin" Client-Side (Catégories)
+        // Comme l'API formations n'a pas (encore) de paramètre ?category=dev, on le fait ici
+        this.applyClientSideCategoryFilters();
         
         this.isLoading = false;
-        
-        // FORCER LA MISE À JOUR DE LA VUE
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -102,6 +116,52 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Cette méthode applique les filtres de "Catégorie" (Dev, Design...) sur les données reçues
+  applyClientSideCategoryFilters() {
+    const f = this.activeFilters;
+    const catChecked = f.development || f.design || f.business || f.data;
+
+    if (!catChecked) {
+        this.filteredTrainings = [...this.allTrainings];
+    } else {
+        this.filteredTrainings = this.allTrainings.filter(t => {
+            if (f.development && t.category === 'Development') return true;
+            if (f.design && t.category === 'Design') return true;
+            if (f.business && t.category === 'Business') return true;
+            if (f.data && t.category === 'Data Science') return true;
+            return false;
+        });
+    }
+
+    this.updateActiveTags();
+    this.sortResults();
+    this.calculatePagination();
+  }
+
+  // --- GESTION DES ACTIONS ---
+
+  // Déclenché par la Sidebar ou la Recherche
+  applyFilters() {
+    this.currentPage = 1;
+    // On rappelle loadData car Prix/Format/Search nécessitent un appel API
+    this.loadData();
+  }
+
+  handleFilterChange(newFilters: any) {
+    this.activeFilters = newFilters;
+    this.applyFilters();
+  }
+
+  onSearch() {
+    this.applyFilters();
+  }
+
+  handleReset() {
+    this.searchTerm = '';
+    this.activeFilters = {}; 
+    this.applyFilters();
+  }
+
   // --- LOGIQUE DE TRI ---
   onSortChange() {
     this.sortResults();
@@ -110,7 +170,6 @@ export class TrainingsComponent implements OnInit, OnDestroy {
   }
 
   sortResults() {
-    // Conversion en Number pour éviter les erreurs de soustraction sur des strings
     if (this.sortOption === 'newest') {
       this.filteredTrainings.sort((a, b) => Number(b.id) - Number(a.id));
     } else if (this.sortOption === 'oldest') {
@@ -144,56 +203,6 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  handleReset() {
-    this.searchTerm = '';
-    this.activeFilters = {}; 
-    this.applyFilters();
-  }
-
-  // --- FILTRAGE PRINCIPAL ---
-  handleFilterChange(filters: any) {
-    this.activeFilters = filters;
-    this.applyFilters();
-  }
-
-  onSearch() {
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    const f = this.activeFilters;
-
-    this.filteredTrainings = this.allTrainings.filter(t => {
-      // 1. Recherche Texte
-      const term = this.searchTerm.toLowerCase();
-      const matchSearch = t.title.toLowerCase().includes(term) || (t.description || '').toLowerCase().includes(term);
-      
-      // 2. Filtre Prix
-      let matchPrice = true;
-      if (f.price === 'Free' && t.badgeType !== 'Free') matchPrice = false;
-      if (f.price === 'Paid' && t.badgeType === 'Free') matchPrice = false;
-
-      // 3. Filtre Catégorie
-      let matchCategory = true;
-      const catChecked = f.development || f.design || f.business || f.data;
-      if (catChecked) {
-          matchCategory = false; 
-          if (f.development && t.category === 'Development') matchCategory = true;
-          if (f.design && t.category === 'Design') matchCategory = true;
-          if (f.business && t.category === 'Business') matchCategory = true;
-          if (f.data && t.category === 'Data Science') matchCategory = true;
-      }
-
-      // 4. Filtre Format 
-      return matchSearch && matchPrice && matchCategory;
-    });
-
-    this.updateActiveTags();
-    this.sortResults();
-    this.currentPage = 1;
-    this.calculatePagination();
-  }
-
   // --- PAGINATION ---
   calculatePagination() {
     this.totalPages = Math.ceil(this.filteredTrainings.length / this.itemsPerPage);
@@ -219,18 +228,18 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- MAPPING (SÉCURISÉ & MULTILINGUE) ---
+  // --- MAPPING ---
   private mapToTraining(op: Opportunity): Training {
     const desc = op.description || '';
     const text = (op.title + ' ' + desc).toLowerCase();
     
-    // Logique Catégorie (Français & Anglais)
+    // Logique Catégorie
     let cat = 'General';
-    if (text.includes('code') || text.includes('stack') || text.includes('web') || text.includes('python') || text.includes('dev') || text.includes('programmation')) {
+    if (text.includes('code') || text.includes('stack') || text.includes('web') || text.includes('python') || text.includes('dev')) {
         cat = 'Development';
     } else if (text.includes('design') || text.includes('ux') || text.includes('ui') || text.includes('graphisme')) {
         cat = 'Design';
-    } else if (text.includes('business') || text.includes('marketing') || text.includes('lead') || text.includes('gestion') || text.includes('management')) {
+    } else if (text.includes('business') || text.includes('marketing') || text.includes('lead') || text.includes('gestion')) {
         cat = 'Business';
     } else if (text.includes('data') || text.includes('analytics') || text.includes('donnée') || text.includes('ia')) {
         cat = 'Data Science';

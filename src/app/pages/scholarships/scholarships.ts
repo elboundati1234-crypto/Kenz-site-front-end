@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core'; // AJOUT: ChangeDetectorRef
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, NavigationEnd } from '@angular/router'; 
@@ -25,12 +25,13 @@ interface FilterTag {
 })
 export class ScholarshipsComponent implements OnInit, OnDestroy {
 
-  allScholarships: Scholarship[] = [];
-  filteredScholarships: Scholarship[] = [];
-  paginatedScholarships: Scholarship[] = [];
+  // Données
+  allScholarships: Scholarship[] = [];      // Tous les résultats renvoyés par l'API
+  filteredScholarships: Scholarship[] = []; // Résultats après filtre "tags" (Engineering...)
+  paginatedScholarships: Scholarship[] = []; // Page courante
   
   searchTerm: string = '';
-  isLoading: boolean = true; // AJOUT: Pour gérer l'affichage
+  isLoading: boolean = true;
   
   private routerSubscription: Subscription | undefined;
 
@@ -53,19 +54,16 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
   constructor(
     private opportunityService: OpportunityService,
     private router: Router,
-    private cdr: ChangeDetectorRef // AJOUT: Injection pour forcer la mise à jour
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    console.log("ScholarshipsComponent: Init");
-    
-    // 1. Chargement initial immédiat
+    // 1. Chargement initial
     this.loadData();
 
-    // 2. Écoute du rechargement (si clic sur le header alors qu'on est déjà là)
+    // 2. Gestion du rechargement via Router
     this.routerSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        console.log("ScholarshipsComponent: NavigationEnd detecté -> Reloading data");
         this.loadData();
       }
     });
@@ -77,38 +75,109 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- CHARGEMENT DES DONNÉES ---
+  // --- CHARGEMENT INTELLIGENT (API + FILTRES) ---
   loadData() {
     this.isLoading = true;
-    
-    this.opportunityService.getOpportunities().subscribe({
-      next: (opportunities: Opportunity[]) => {
-        console.log("Données reçues du service:", opportunities.length);
 
-        // Filtrage sécurisé
-        const rawData = opportunities.filter(op => op.type === 'Scholarship');
-        console.log("Bourses filtrées (Scholarship):", rawData.length);
+    // 1. Préparation des filtres pour l'API
+    const apiFilters: any = {};
 
-        // Mapping
-        this.allScholarships = rawData.map(op => this.mapOpportunityToScholarship(op));
+    // A. Recherche Texte
+    if (this.searchTerm) apiFilters.search = this.searchTerm;
+
+    // B. Localisation
+    if (this.activeFilters.location && this.activeFilters.location !== 'Any Location') {
+      apiFilters.pays = this.activeFilters.location;
+    }
+
+    // C. Niveau (API attend 'niveau')
+    // On priorise le niveau le plus élevé si plusieurs sont cochés, ou on adapte selon logique métier
+    if (this.activeFilters.phd) apiFilters.niveau = 'Doctorat';
+    else if (this.activeFilters.masters) apiFilters.niveau = 'Master';
+    else if (this.activeFilters.undergrad) apiFilters.niveau = 'Licence';
+
+    // D. Closing Soon
+    if (this.activeFilters.closingSoon) apiFilters.closingSoon = true;
+
+    // 2. Appel API
+    this.opportunityService.getScholarships(apiFilters).subscribe({
+      next: (data: Opportunity[]) => {
         
-        // Initialisation de la liste affichée
-        this.filteredScholarships = [...this.allScholarships];
+        // 3. Mapping des résultats
+        // On récupère les données pré-filtrées par le serveur (Pays, Niveau, Texte, Date)
+        this.allScholarships = data.map(op => this.mapOpportunityToScholarship(op));
         
-        // Appliquer filtres et tri initiaux
-        this.applyFilters(); 
-        
+        // 4. Filtrage "Fin" Client-Side (Domaines d'études)
+        // Comme l'API bourses n'a pas (encore) de paramètre ?field=engineering, on le fait ici
+        this.applyClientSideDomainFilters();
+
         this.isLoading = false;
-
-        // FORCE LA MISE À JOUR DE LA VUE (Solution au problème d'affichage)
-        this.cdr.detectChanges(); 
+        this.cdr.detectChanges(); // Force l'affichage
       },
       error: (err) => {
-        console.error("Erreur chargement bourses:", err);
+        console.error("Erreur chargement Bourses:", err);
         this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  // Cette méthode applique les filtres de "Domaine" (Engineering, Medical...) 
+  // sur les données déjà reçues de l'API.
+  applyClientSideDomainFilters() {
+    const f = this.activeFilters;
+    const hasFieldFilter = f.engineering || f.medical || f.business || f.arts || f.cs;
+
+    if (!hasFieldFilter) {
+      // Si aucun domaine coché, on garde tout ce que l'API a envoyé
+      this.filteredScholarships = [...this.allScholarships];
+    } else {
+      // Sinon, on filtre localement
+      this.filteredScholarships = this.allScholarships.filter(item => {
+        const itemTags = item.tags ? item.tags.map(t => t.toLowerCase()) : [];
+        let match = false;
+        
+        if (f.engineering && itemTags.includes('engineering')) match = true;
+        if (f.medical && itemTags.includes('medical')) match = true;
+        if (f.business && itemTags.includes('business')) match = true;
+        if (f.arts && itemTags.includes('arts')) match = true;
+        if (f.cs && itemTags.includes('cs')) match = true;
+        
+        return match;
+      });
+    }
+
+    this.updateActiveTags();
+    this.sortResults();       // Tri local
+    this.calculatePagination(); // Pagination locale
+  }
+
+  // --- GESTION DES ACTIONS UTILISATEUR ---
+
+  // Déclenché par la Sidebar ou la Recherche
+  applyFilters() {
+    this.currentPage = 1;
+    // On rappelle loadData car certains filtres (Pays, Niveau) nécessitent un appel API
+    this.loadData(); 
+  }
+
+  handleFilterChange(newFilters: any) {
+    this.activeFilters = newFilters;
+    this.applyFilters();
+  }
+
+  onSearch() {
+    this.applyFilters();
+  }
+
+  handleReset() {
+    this.searchTerm = '';
+    // Reset des filtres actifs
+    this.activeFilters = {
+        engineering: false, medical: false, business: false, arts: false, cs: false,
+        undergrad: false, masters: false, phd: false, closingSoon: false, location: 'Any Location'
+    };
+    this.applyFilters();
   }
 
   // --- LOGIQUE DE TRI ---
@@ -154,79 +223,8 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
     } else {
       this.activeFilters[tag.key] = false;
     }
+    // On recharge car supprimer un tag peut nécessiter un nouvel appel API (ex: location)
     this.applyFilters();
-  }
-
-  handleFilterChange(newFilters: any) {
-    this.activeFilters = newFilters;
-    this.applyFilters();
-  }
-
-  onSearch() {
-    this.applyFilters();
-  }
-
-  handleReset() {
-    this.searchTerm = '';
-    // Réinitialiser les filtres si nécessaire
-    this.activeFilters.location = 'Any Location';
-    this.activeFilters.engineering = false; // etc...
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    this.filteredScholarships = this.allScholarships.filter(item => {
-      // 1. Recherche Texte
-      const term = this.searchTerm.toLowerCase();
-      const matchesSearch = item.title.toLowerCase().includes(term) || (item.description || '').toLowerCase().includes(term);
-      if (!matchesSearch) return false;
-
-      // 2. Filtres Sidebar
-      const f = this.activeFilters;
-      const itemTags = item.tags ? item.tags.map(t => t.toLowerCase()) : [];
-      
-      const hasFieldFilter = f.engineering || f.medical || f.business || f.arts || f.cs;
-      if (hasFieldFilter) {
-        let match = false;
-        if (f.engineering && itemTags.includes('engineering')) match = true;
-        if (f.medical && itemTags.includes('medical')) match = true;
-        if (f.business && itemTags.includes('business')) match = true;
-        if (f.arts && itemTags.includes('arts')) match = true;
-        if (f.cs && itemTags.includes('cs')) match = true;
-        if (!match) return false;
-      }
-
-      // 3. Level
-      const hasLevelFilter = f.undergrad || f.masters || f.phd;
-      const level = (item.level || '').toLowerCase();
-      if (hasLevelFilter) {
-        let match = false;
-        if (f.undergrad && (level.includes('undergrad') || level.includes('bachelor') || level.includes('licence'))) match = true;
-        if (f.masters && (level.includes("master") || (level.includes('graduate') && !level.includes('under')))) match = true;
-        if (f.phd && (level.includes('phd') || level.includes('doctorate') || level.includes('doctorat'))) match = true;
-        if (!match) return false;
-      }
-
-      // 4. Closing Soon
-      const deadline = item.deadline || '';
-      if (f.closingSoon) {
-        const isSoon = deadline.includes('Oct') || deadline.includes('Nov') || deadline.includes('Dec');
-        if (!isSoon) return false;
-      }
-
-      // 5. Location
-      const loc = (item.location || '').toLowerCase();
-      if (f.location && f.location !== 'Any Location' && !loc.includes(f.location.toLowerCase())) {
-        return false;
-      }
-
-      return true;
-    });
-
-    this.updateActiveTags();
-    this.sortResults();
-    this.currentPage = 1;
-    this.calculatePagination();
   }
 
   // --- PAGINATION ---
@@ -254,11 +252,12 @@ export class ScholarshipsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // --- MAPPING ---
+  // --- MAPPING (Identique à avant) ---
   private mapOpportunityToScholarship(op: Opportunity): Scholarship {
     const fullText = (op.title + ' ' + (op.description || '')).toLowerCase();
     const tags: string[] = [];
 
+    // Détection de tags pour le filtrage client-side
     if (fullText.includes('engin') || fullText.includes('ingénieur') || fullText.includes('génie')) tags.push('Engineering');
     if (fullText.includes('med') || fullText.includes('health') || fullText.includes('sante') || fullText.includes('médecine')) tags.push('Medical');
     if (fullText.includes('busin') || fullText.includes('mba') || fullText.includes('gestion') || fullText.includes('management')) tags.push('Business');

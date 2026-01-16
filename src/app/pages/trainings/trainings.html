@@ -1,3 +1,4 @@
+
 <div class="hero-section d-flex align-items-center justify-content-center p-4 text-center text-white" 
      style='background-image: linear-gradient(rgba(19, 127, 236, 0.9), rgba(16, 25, 34, 0.9)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBUahCExusFLzbr_FzQGpHCxCkuHSXURYYdh6_3aEV7ZHuBR-ClPM6x6ez69C6cOS1p_CB1e9yLRv2RvvCWL5e_Bl3ydOfGHM4HlCT1ewHrm53RjxBl1-24SsaM8X-sfc9ZcVLDdWttHfOkKh96uzQbnFWUQ1ptSuOlaOLjJogQBBfaYxL9TzBqEaogerkaeNAW7pan0ufjjWAQdmGR7W6SHG6DaGsgRDMXYm7HzUTOwHBBl6_lZDXnAU8tH7EpFhvorV5nCZxRD4-7"); min-height: 320px; background-size: cover; background-position: center;'>
     
@@ -45,7 +46,7 @@
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
                 <div>
                     <h2 class="h4 fw-bold mb-0">Available Trainings</h2>
-                    <p class="text-secondary small mb-0">Showing {{ filteredTrainings.length }} results</p>
+                    <p *ngIf="!isLoading" class="text-secondary small mb-0">Showing {{ filteredTrainings.length }} results</p>
                 </div>
 
                 <div class="d-flex align-items-center">
@@ -77,7 +78,14 @@
                 </button>
             </div>
 
-            <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            <div *ngIf="isLoading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Searching trainings...</p>
+            </div>
+
+            <div *ngIf="!isLoading" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
                 <div class="col" *ngFor="let item of paginatedTrainings">
                     <app-training-card [training]="item"></app-training-card>
                 </div>
@@ -89,7 +97,7 @@
                 </div>
             </div>
 
-            <div class="mt-5 d-flex justify-content-center" *ngIf="totalPages > 1">
+            <div class="mt-5 d-flex justify-content-center" *ngIf="!isLoading && totalPages > 1">
                 <nav aria-label="Page navigation">
                     <ul class="pagination gap-2">
                         <li class="page-item" [class.disabled]="currentPage === 1">

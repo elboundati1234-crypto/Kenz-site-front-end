@@ -1,11 +1,11 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core'; // AJOUT: ChangeDetectorRef
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, NavigationEnd, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { Opportunity } from '../../models/opportunity';
-import { OpportunityService } from '../../services/opportunity'; // Assurez-vous du chemin .service
+import { OpportunityService } from '../../services/opportunity';
 
 @Component({
   selector: 'app-events',
@@ -18,137 +18,149 @@ export class EventsComponent implements OnInit, OnDestroy {
 
   // Données
   opportunities: Opportunity[] = [];
-  filteredOpportunities: Opportunity[] = [];
+  filteredOpportunities: Opportunity[] = []; // Liste affichée
   
-  // États de l'interface
+  // États
   isLoading: boolean = true;
   private routerSubscription: Subscription | undefined;
 
   // Filtres
   searchTerm: string = '';
-  selectedType: string = '';
-  selectedLocation: string = '';
+  selectedLocation: string = ''; // Correspond à 'pays' dans l'API
+  selectedDate: string = '';     // Correspond à 'date' dans l'API (ex: 'thisWeek')
   selectedSort: string = 'Newest';
+
+  // Variable inutilisée pour l'API Events mais gardée pour la structure
+  selectedType: string = ''; 
 
   constructor(
     private opportunityService: OpportunityService,
     private router: Router,
-    private cdr: ChangeDetectorRef // AJOUT: Injection pour forcer la mise à jour
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     // 1. Chargement initial
     this.loadData();
 
-    // 2. Abonnement aux événements de navigation
+    // 2. Gestion du rechargement (Navigation)
     this.routerSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        // Recharger les données si on clique sur le lien alors qu'on est déjà sur la page
         this.loadData();
       }
     });
   }
 
-  // Désinscription pour éviter les fuites de mémoire
   ngOnDestroy(): void {
     if (this.routerSubscription) {
       this.routerSubscription.unsubscribe();
     }
   }
 
-  // --- CHARGEMENT DES DONNÉES ---
+  // --- CHARGEMENT VIA API ---
   loadData(): void {
     this.isLoading = true;
 
-    this.opportunityService.getOpportunities().subscribe({
+    // 1. Préparation des filtres pour l'API
+    const apiFilters: any = {};
+
+    // A. Recherche
+    if (this.searchTerm) {
+      apiFilters.search = this.searchTerm;
+    }
+
+    // B. Location (Pays)
+    // Note : L'API attend un pays. Si 'Online', on l'envoie comme pays.
+    if (this.selectedLocation) {
+      if (this.selectedLocation === 'Online') {
+        apiFilters.pays = 'Online';
+      } else if (this.selectedLocation !== 'In Person') {
+        // Si c'est un pays spécifique (ex: Morocco) et pas juste "In Person"
+        apiFilters.pays = this.selectedLocation;
+      }
+      // Si c'est juste "In Person" (sans pays), on n'envoie pas de filtre pays 
+      // pour récupérer tous les événements physiques.
+    }
+
+    // C. Date (thisWeek, nextMonth)
+    if (this.selectedDate) {
+      apiFilters.date = this.selectedDate;
+    }
+
+    // 2. Appel au Service (qui appelle /api/filters/evenements)
+    this.opportunityService.getEvents(apiFilters).subscribe({
       next: (data) => {
-        // Filtre strict sur 'Event' en utilisant la nouvelle propriété type
-        const eventsOnly = data.filter(op => op.type === 'Event');
+        // Le Backend renvoie déjà uniquement les 'Events' filtrés
+        this.opportunities = data;
+        this.filteredOpportunities = data;
         
-        this.opportunities = eventsOnly;
-        this.filteredOpportunities = eventsOnly;
-        
+        // 3. Tri Client-side (si l'API ne gère pas le sort)
+        this.sortResults();
+
         this.isLoading = false;
-        this.applyFilters(); // Appliquer le tri par défaut
-        
-        // IMPORTANT : Force la mise à jour de la vue
-        this.cdr.detectChanges();
+        this.cdr.detectChanges(); // Force l'affichage
       },
       error: (err) => {
-        console.error('Erreur de chargement des événements:', err);
+        console.error('Erreur chargement Events:', err);
         this.isLoading = false;
-        this.cdr.detectChanges(); // On force la mise à jour même en cas d'erreur (pour arrêter le loader)
+        this.cdr.detectChanges();
       }
     });
   }
 
-  // --- FILTRAGE PRINCIPAL ---
+  // --- GESTION DES FILTRES ---
+  
+  // Appelé quand l'utilisateur change un filtre ou tape dans la recherche
   applyFilters(): void {
-    let temp = [...this.opportunities]; // Copie pour ne pas modifier l'original
-
-    // 1. Recherche Texte (Sécurisée)
-    if (this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      temp = temp.filter(item =>
-        item.title.toLowerCase().includes(term) ||
-        (item.description || '').toLowerCase().includes(term) ||
-        item.organization.toLowerCase().includes(term)
-      );
-    }
-
-    // 2. Filtre Type
-    if (this.selectedType) {
-       // Logique future pour les sous-types
-    }
-
-    // 3. Filtre Location
-    if (this.selectedLocation) {
-      if (this.selectedLocation === 'Online') {
-        temp = temp.filter(item => this.isOnline(item.location));
-      } else if (this.selectedLocation === 'In Person') {
-        temp = temp.filter(item => !this.isOnline(item.location));
-      }
-    }
-
-    // 4. Tri (Sécurisé)
-    if (this.selectedSort) {
-      temp.sort((a, b) => { 
-        const dateA = a.deadline ? new Date(a.deadline).getTime() : 0;
-        const dateB = b.deadline ? new Date(b.deadline).getTime() : 0;
-        
-        const validDateA = isNaN(dateA) ? 0 : dateA;
-        const validDateB = isNaN(dateB) ? 0 : dateB;
-
-        return this.selectedSort === 'Newest' ? validDateB - validDateA : validDateA - validDateB;
-      });
-    }
-
-    this.filteredOpportunities = temp;
+    // On délègue tout au Backend via loadData
+    this.loadData();
   }
 
-  // --- HELPERS ---
-
-  setType(type: string) {
-    this.selectedType = type;
-    this.applyFilters();
-  }
+  // --- HELPERS POUR L'UI ---
 
   setLocation(location: string) {
     this.selectedLocation = location;
     this.applyFilters();
   }
 
-  setSort(sort: string) {
-    this.selectedSort = sort;
+  // Nouvelle méthode pour le filtre de date
+  setDate(dateFilter: string) {
+    // Valeurs attendues par l'API: 'thisWeek', 'nextMonth', ou ''
+    this.selectedDate = dateFilter;
     this.applyFilters();
   }
 
+  setSort(sort: string) {
+    this.selectedSort = sort;
+    // Le tri est fait localement après réception des données
+    this.sortResults(); 
+  }
+
+  // Tri local (Client-Side)
+  sortResults() {
+    // On trie sur filteredOpportunities pour mise à jour immédiate
+    this.filteredOpportunities.sort((a, b) => { 
+      const dateA = a.deadline ? new Date(a.deadline).getTime() : 0;
+      const dateB = b.deadline ? new Date(b.deadline).getTime() : 0;
+      
+      const validDateA = isNaN(dateA) ? 0 : dateA;
+      const validDateB = isNaN(dateB) ? 0 : dateB;
+
+      if (this.selectedSort === 'Newest') {
+        return validDateB - validDateA;
+      } else {
+        return validDateA - validDateB;
+      }
+    });
+  }
+
+  // Helper visuel pour savoir si c'est en ligne (pour l'icône)
   isOnline(location: string): boolean {
     const loc = (location || '').toLowerCase();
     return loc.includes('online') || loc.includes('remote') || loc.includes('zoom') || loc.includes('webinar');
   }
 
   getBadgeClass(type: string): string {
-    return 'bg-primary-subtle text-primary border-primary-subtle bg-opacity-75 backdrop-blur fw-bold';
+    return 'bg-warning-subtle text-dark border-warning-subtle bg-opacity-75 backdrop-blur fw-bold';
   }
 }
