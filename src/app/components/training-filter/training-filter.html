@@ -4,33 +4,31 @@
         <span class="material-symbols-outlined text-secondary fs-6">expand_less</span>
     </h3>
     <div class="d-flex flex-column gap-2">
+        
         <div class="form-check d-flex align-items-center p-0 mb-0">
             <input class="form-check-input mt-0 me-3" type="checkbox" id="subDev" 
                    [(ngModel)]="filters.development" (change)="onFilterChange()">
             <label class="form-check-label flex-grow-1" for="subDev">Development</label>
-            <span class="badge bg-light text-secondary rounded-pill fw-normal">124</span>
-        </div>
-
-        <div class="form-check d-flex align-items-center p-0 mb-0">
-            <input class="form-check-input mt-0 me-3" type="checkbox" id="subBus" 
-                   [(ngModel)]="filters.business" (change)="onFilterChange()">
-            <label class="form-check-label flex-grow-1" for="subBus">Business</label>
-            <span class="badge bg-light text-secondary rounded-pill fw-normal">85</span>
-        </div>
-
-        <div class="form-check d-flex align-items-center p-0 mb-0">
-            <input class="form-check-input mt-0 me-3" type="checkbox" id="subDes" 
-                   [(ngModel)]="filters.design" (change)="onFilterChange()">
-            <label class="form-check-label flex-grow-1" for="subDes">Design & Art</label>
-            <span class="badge bg-light text-secondary rounded-pill fw-normal">42</span>
         </div>
 
         <div class="form-check d-flex align-items-center p-0 mb-0">
             <input class="form-check-input mt-0 me-3" type="checkbox" id="subData" 
                    [(ngModel)]="filters.data" (change)="onFilterChange()">
             <label class="form-check-label flex-grow-1" for="subData">Data Science</label>
-            <span class="badge bg-light text-secondary rounded-pill fw-normal">21</span>
         </div>
+
+        <div class="form-check d-flex align-items-center p-0 mb-0">
+            <input class="form-check-input mt-0 me-3" type="checkbox" id="subDes" 
+                   [(ngModel)]="filters.design" (change)="onFilterChange()">
+            <label class="form-check-label flex-grow-1" for="subDes">Design & Art</label>
+        </div>
+
+        <div class="form-check d-flex align-items-center p-0 mb-0">
+            <input class="form-check-input mt-0 me-3" type="checkbox" id="subBus" 
+                   [(ngModel)]="filters.business" (change)="onFilterChange()">
+            <label class="form-check-label flex-grow-1" for="subBus">Business</label>
+        </div>
+
     </div>
 </div>
 

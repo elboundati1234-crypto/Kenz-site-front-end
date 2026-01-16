@@ -6,30 +6,31 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-training-filter',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './training-filter.html', // Assurez-vous du nom correct
+  templateUrl: './training-filter.html', 
   styleUrls: ['./training-filter.css']
 })
 export class TrainingFilterComponent {
   
-  // Ces clés correspondent exactement à ce que TrainingsComponent attend
+  // Ces filtres correspondent aux catégories "mappées" dans TrainingsComponent
   filters = {
-    development: false, // Remplace 'cs'
-    business: false,
-    design: false,
-    data: false,        // Remplace 'health' pour matcher Data Science
+    development: false, // Pour: Web Dev, Full Stack, DevOps, React...
+    data: false,        // Pour: Machine Learning, Data Analysis...
+    design: false,      // Pour: UX/UI Design...
+    business: false,    // Pour: Marketing, Management...
     
-    format: 'All',      // Changé en string pour matcher l'API (Online/InPerson)
-    price: 'All'
+    format: 'All',      // 'Online' ou 'In Person'
+    price: 'All'        // 'Free' ou 'Paid'
   };
 
   @Output() filterChange = new EventEmitter<any>();
-  @Output() reset = new EventEmitter<void>(); // Ajout d'un event spécifique pour le reset
+  @Output() reset = new EventEmitter<void>();
 
   onFilterChange() {
     this.filterChange.emit(this.filters);
   }
 
   resetFilters() {
+    // Réinitialisation des valeurs
     this.filters = { 
       development: false, 
       business: false, 
@@ -39,10 +40,10 @@ export class TrainingFilterComponent {
       price: 'All' 
     };
     
-    // On émet le changement pour recharger la liste
+    // Notification au parent pour recharger la liste complète
     this.filterChange.emit(this.filters);
     
-    // On prévient le parent (optionnel, pour nettoyer la barre de recherche par ex)
+    // Notification spécifique pour reset (ex: vider la barre de recherche)
     this.reset.emit();
   }
 }

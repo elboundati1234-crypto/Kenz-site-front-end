@@ -25,9 +25,9 @@ interface FilterTag {
 })
 export class TrainingsComponent implements OnInit, OnDestroy {
   
-  allTrainings: Training[] = [];      // Données brutes
-  filteredTrainings: Training[] = []; // Données filtrées et triées
-  paginatedTrainings: Training[] = []; // Données de la page visible
+  allTrainings: Training[] = [];
+  filteredTrainings: Training[] = [];
+  paginatedTrainings: Training[] = [];
   
   searchTerm: string = '';
   isLoading: boolean = true;
@@ -35,8 +35,7 @@ export class TrainingsComponent implements OnInit, OnDestroy {
   private routerSubscription: Subscription | undefined;
 
   // --- Tri et Tags ---
-  // Valeur par défaut 'relevant' pour correspondre au HTML
-  sortOption: string = 'relevant'; 
+  sortOption: string = 'relevant';
   activeTags: FilterTag[] = [];
   
   // --- Pagination ---
@@ -85,7 +84,10 @@ export class TrainingsComponent implements OnInit, OnDestroy {
 
     this.opportunityService.getTrainings(apiFilters).subscribe({
       next: (data: Opportunity[]) => {
+        // Mapping des données brutes vers le modèle Training avec les nouvelles catégories
         this.allTrainings = data.map(op => this.mapToTraining(op));
+        
+        // Application des filtres locaux (ex: Design & Art)
         this.applyClientSideCategoryFilters();
         
         this.isLoading = false;
@@ -108,7 +110,8 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     } else {
         this.filteredTrainings = this.allTrainings.filter(t => {
             if (f.development && t.category === 'Development') return true;
-            if (f.design && t.category === 'Design') return true;
+            // On inclut "Design & Art" ici
+            if (f.design && (t.category === 'Design' || t.category === 'Design & Art')) return true;
             if (f.business && t.category === 'Business') return true;
             if (f.data && t.category === 'Data Science') return true;
             return false;
@@ -116,11 +119,9 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     }
 
     this.updateActiveTags();
-    this.sortResults(); // On trie après avoir filtré
+    this.sortResults(); 
     this.calculatePagination();
   }
-
-  // --- GESTION DES ACTIONS ---
 
   applyFilters() {
     this.currentPage = 1;
@@ -142,7 +143,6 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  // --- LOGIQUE DE TRI ---
   onSortChange() {
     this.sortResults();
     this.currentPage = 1;
@@ -150,26 +150,17 @@ export class TrainingsComponent implements OnInit, OnDestroy {
   }
 
   sortResults() {
-    // 1. Tri "Newest" : ID décroissant (le plus grand ID est le plus récent dans MongoDB)
     if (this.sortOption === 'newest') {
       this.filteredTrainings.sort((a, b) => String(b.id).localeCompare(String(a.id)));
-    } 
-    
-    // 2. Tri "Price: Low to High" : Les gratuits ('Free') d'abord
-    else if (this.sortOption === 'price_asc') {
+    } else if (this.sortOption === 'price_asc') {
       this.filteredTrainings.sort((a, b) => {
         const isAFree = a.badgeType === 'Free';
         const isBFree = b.badgeType === 'Free';
-
-        if (isAFree && !isBFree) return -1; // A vient avant B
-        if (!isAFree && isBFree) return 1;  // B vient avant A
-        return 0; // Pas de changement
+        if (isAFree && !isBFree) return -1;
+        if (!isAFree && isBFree) return 1; 
+        return 0;
       });
-    } 
-    
-    // 3. Tri "Most Relevant" : Par défaut (souvent ID décroissant pour voir les nouveautés)
-    else {
-        // Fallback sur le plus récent
+    } else {
         this.filteredTrainings.sort((a, b) => String(b.id).localeCompare(String(a.id)));
     }
   }
@@ -182,7 +173,7 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     if (f.price === 'Paid') this.activeTags.push({ key: 'price', label: 'Paid Only' });
     
     if (f.development) this.activeTags.push({ key: 'development', label: 'Development' });
-    if (f.design) this.activeTags.push({ key: 'design', label: 'Design' });
+    if (f.design) this.activeTags.push({ key: 'design', label: 'Design & Art' }); // Label mis à jour
     if (f.business) this.activeTags.push({ key: 'business', label: 'Business' });
     if (f.data) this.activeTags.push({ key: 'data', label: 'Data Science' });
 
@@ -223,21 +214,33 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     }
   }
 
+  // --- LOGIQUE DE MAPPING CATÉGORIE ---
   private mapToTraining(op: Opportunity): Training {
+    // Note: OpportunityService met la filière dans la description sous la forme "[Filiere] Description..."
     const desc = op.description || '';
-    const text = (op.title + ' ' + desc).toLowerCase();
+    const title = op.title || '';
+    const text = (title + ' ' + desc).toLowerCase();
     
     let cat = 'General';
-    if (text.includes('code') || text.includes('stack') || text.includes('web') || text.includes('python') || text.includes('dev') || text.includes('java')) {
-        cat = 'Development';
-    } else if (text.includes('design') || text.includes('ux') || text.includes('ui') || text.includes('graphisme')) {
-        cat = 'Design';
-    } else if (text.includes('business') || text.includes('marketing') || text.includes('lead') || text.includes('gestion')) {
-        cat = 'Business';
-    } else if (text.includes('data') || text.includes('analytics') || text.includes('donnée') || text.includes('ia') || text.includes('intelligence')) {
+
+    // 1. DATA SCIENCE (Priorité aux mots clés Machine Learning, Data, Analysis)
+    if (text.includes('machine learning') || text.includes('data analysis') || text.includes('data science') || text.includes('big data') || text.includes('intelligence artificielle') || text.includes('ia')) {
         cat = 'Data Science';
+    } 
+    // 2. DESIGN & ART (Priorité aux mots clés UX, UI, Design)
+    else if (text.includes('ux') || text.includes('ui') || text.includes('design') || text.includes('art') || text.includes('graphisme') || text.includes('creative')) {
+        cat = 'Design & Art';
+    } 
+    // 3. BUSINESS
+    else if (text.includes('business') || text.includes('marketing') || text.includes('management') || text.includes('finance') || text.includes('entrepreneuriat')) {
+        cat = 'Business';
+    } 
+    // 4. DEVELOPMENT (Tout ce qui reste lié au code)
+    else if (text.includes('dev') || text.includes('code') || text.includes('stack') || text.includes('web') || text.includes('cloud') || text.includes('react') || text.includes('java') || text.includes('python')) {
+        cat = 'Development';
     }
 
+    // Gestion du Badge
     let badge: 'Featured' | 'Popular' | 'Free' | undefined = undefined;
     const valSafe = (op.value || '').toLowerCase();
     const tagsSafe = op.tags || [];
@@ -251,7 +254,7 @@ export class TrainingsComponent implements OnInit, OnDestroy {
     return {
       id: op.id as any, 
       title: op.title,
-      category: cat,
+      category: cat, // La catégorie est maintenant correctement assignée
       organization: op.organization,
       image: op.imageUrl,
       duration: op.duration || 'Self-paced',
