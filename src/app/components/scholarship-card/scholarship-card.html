@@ -36,7 +36,7 @@
               <div class="d-flex justify-content-between align-items-center pt-3 border-top">
                   <div class="d-flex align-items-center gap-1 text-secondary">
                       <span class="material-symbols-outlined" style="font-size: 18px;">calendar_month</span>
-                      <span class="small">{{ scholarship.deadline }}</span>
+                      <span class="small">{{ scholarship.deadline | date:'dd/MM/yyyy' }}</span>
                   </div>
                   <span class="fw-bold text-dark">{{ scholarship.amount }}</span>
               </div>
