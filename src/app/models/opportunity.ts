@@ -29,4 +29,6 @@ export interface Opportunity {
   
   registrationLink?: string; // Mappé depuis 'lienSource'
   tags?: string[];
+
+  dateDebut?: string | Date;
 }

@@ -17,8 +17,8 @@ import { OpportunityService } from '../../services/opportunity';
 export class EventsComponent implements OnInit, OnDestroy {
 
   // Données
-  opportunities: Opportunity[] = [];
-  filteredOpportunities: Opportunity[] = []; // Liste affichée
+  allOpportunities: Opportunity[] = []; // Stocke TOUTES les données (Brutes)
+  filteredOpportunities: Opportunity[] = []; // Stocke les données FILTRÉES (Affichées)
   
   // États
   isLoading: boolean = true;
@@ -26,12 +26,9 @@ export class EventsComponent implements OnInit, OnDestroy {
 
   // Filtres
   searchTerm: string = '';
-  selectedLocation: string = ''; // Correspond à 'pays' dans l'API
-  selectedDate: string = '';     // Correspond à 'date' dans l'API (ex: 'thisWeek')
+  selectedLocation: string = ''; 
+  selectedDate: string = '';     // 'thisWeek', 'nextMonth', ''
   selectedSort: string = 'Newest';
-
-  // Variable inutilisée pour l'API Events mais gardée pour la structure
-  selectedType: string = ''; 
 
   constructor(
     private opportunityService: OpportunityService,
@@ -40,10 +37,7 @@ export class EventsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // 1. Chargement initial
     this.loadData();
-
-    // 2. Gestion du rechargement (Navigation)
     this.routerSubscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.loadData();
@@ -56,53 +50,35 @@ export class EventsComponent implements OnInit, OnDestroy {
       this.routerSubscription.unsubscribe();
     }
   }
-// --- GESTION DES IMAGES CASSÉES ---
+
   handleImageError(event: any) {
-    // Utilise l'image placeholder.jpg située dans votre dossier public
     event.target.src = 'placeholder.jpg';
   }
+
   // --- CHARGEMENT VIA API ---
   loadData(): void {
     this.isLoading = true;
 
-    // 1. Préparation des filtres pour l'API
+    // 1. On envoie Search et Location au serveur
     const apiFilters: any = {};
 
-    // A. Recherche
-    if (this.searchTerm) {
-      apiFilters.search = this.searchTerm;
-    }
+    if (this.searchTerm) apiFilters.search = this.searchTerm;
 
-    // B. Location (Pays)
-    // Note : L'API attend un pays. Si 'Online', on l'envoie comme pays.
     if (this.selectedLocation) {
-      if (this.selectedLocation === 'Online') {
-        apiFilters.pays = 'Online';
-      } else if (this.selectedLocation !== 'In Person') {
-        // Si c'est un pays spécifique (ex: Morocco) et pas juste "In Person"
-        apiFilters.pays = this.selectedLocation;
-      }
-      // Si c'est juste "In Person" (sans pays), on n'envoie pas de filtre pays 
-      // pour récupérer tous les événements physiques.
+      if (this.selectedLocation === 'Online') apiFilters.pays = 'Online';
+      else if (this.selectedLocation !== 'In Person') apiFilters.pays = this.selectedLocation;
     }
 
-    // C. Date (thisWeek, nextMonth)
-    if (this.selectedDate) {
-      apiFilters.date = this.selectedDate;
-    }
-
-    // 2. Appel au Service (qui appelle /api/filters/evenements)
+    // NOTE: On n'envoie PAS 'date' au serveur, on le gère localement pour que "This Week" fonctionne
     this.opportunityService.getEvents(apiFilters).subscribe({
       next: (data) => {
-        // Le Backend renvoie déjà uniquement les 'Events' filtrés
-        this.opportunities = data;
-        this.filteredOpportunities = data;
+        this.allOpportunities = data;
         
-        // 3. Tri Client-side (si l'API ne gère pas le sort)
-        this.sortResults();
+        // 2. On applique les filtres de date et le tri localement
+        this.applyLocalFilters();
 
         this.isLoading = false;
-        this.cdr.detectChanges(); // Force l'affichage
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur chargement Events:', err);
@@ -112,53 +88,86 @@ export class EventsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- GESTION DES FILTRES ---
-  
-  // Appelé quand l'utilisateur change un filtre ou tape dans la recherche
+  // --- LOGIQUE DE FILTRAGE LOCAL (Pour This Week / Next Month) ---
+  applyLocalFilters() {
+    let temp = [...this.allOpportunities];
+
+    // 1. FILTRE DATE
+    if (this.selectedDate) {
+        const now = new Date();
+        // Pour éviter les problèmes d'heures, on met "maintenant" à 00:00:00
+        now.setHours(0,0,0,0); 
+        
+        if (this.selectedDate === 'thisWeek') {
+            const nextWeek = new Date(now);
+            nextWeek.setDate(now.getDate() + 7);
+
+            temp = temp.filter(op => {
+                const opDate = this.getDateFromOpportunity(op);
+                return opDate >= now && opDate <= nextWeek;
+            });
+        } 
+        else if (this.selectedDate === 'nextMonth') {
+            // Premier jour du mois prochain
+            const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+            // Dernier jour du mois prochain
+            const nextMonthEnd = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+
+            temp = temp.filter(op => {
+                const opDate = this.getDateFromOpportunity(op);
+                return opDate >= nextMonthStart && opDate <= nextMonthEnd;
+            });
+        }
+    }
+
+    // 2. TRI (Basé sur la date de début)
+    temp.sort((a, b) => { 
+      const dateA = this.getDateFromOpportunity(a).getTime();
+      const dateB = this.getDateFromOpportunity(b).getTime();
+      
+      if (this.selectedSort === 'Newest') {
+        return dateB - dateA; // Le plus récent (futur) en premier
+      } else {
+        return dateA - dateB; // Le plus proche (bientôt) en premier
+      }
+    });
+
+    this.filteredOpportunities = temp;
+  }
+
+  // Helper pour récupérer dateDebut proprement
+  private getDateFromOpportunity(op: Opportunity): Date {
+      // On utilise dateDebut, sinon deadline, sinon aujourd'hui (pour éviter le crash)
+      const dateStr = op.dateDebut || op.deadline; 
+      if (!dateStr) return new Date(0); // Date très ancienne par défaut
+      return new Date(dateStr);
+  }
+
+  // --- ACTIONS UI ---
+
   applyFilters(): void {
-    // On délègue tout au Backend via loadData
+    // Si on change la recherche, on recharge tout via l'API
     this.loadData();
   }
 
-  // --- HELPERS POUR L'UI ---
-
   setLocation(location: string) {
     this.selectedLocation = location;
-    this.applyFilters();
+    this.loadData();
   }
 
-  // Nouvelle méthode pour le filtre de date
   setDate(dateFilter: string) {
-    // Valeurs attendues par l'API: 'thisWeek', 'nextMonth', ou ''
     this.selectedDate = dateFilter;
-    this.applyFilters();
+    // Ici, PAS besoin de rappeler l'API, on filtre juste ce qu'on a déjà reçu
+    this.applyLocalFilters(); 
   }
 
   setSort(sort: string) {
     this.selectedSort = sort;
-    // Le tri est fait localement après réception des données
-    this.sortResults(); 
+    this.applyLocalFilters(); // Tri local uniquement
   }
 
-  // Tri local (Client-Side)
-  sortResults() {
-    // On trie sur filteredOpportunities pour mise à jour immédiate
-    this.filteredOpportunities.sort((a, b) => { 
-      const dateA = a.deadline ? new Date(a.deadline).getTime() : 0;
-      const dateB = b.deadline ? new Date(b.deadline).getTime() : 0;
-      
-      const validDateA = isNaN(dateA) ? 0 : dateA;
-      const validDateB = isNaN(dateB) ? 0 : dateB;
+  // --- HELPERS VISUELS ---
 
-      if (this.selectedSort === 'Newest') {
-        return validDateB - validDateA;
-      } else {
-        return validDateA - validDateB;
-      }
-    });
-  }
-
-  // Helper visuel pour savoir si c'est en ligne (pour l'icône)
   isOnline(location: string): boolean {
     const loc = (location || '').toLowerCase();
     return loc.includes('online') || loc.includes('remote') || loc.includes('zoom') || loc.includes('webinar');

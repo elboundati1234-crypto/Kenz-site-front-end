@@ -182,6 +182,7 @@ export class OpportunityService {
       eligibility: data.eligibility ? [data.eligibility] : [],
       
       deadline: deadlineStr,
+      dateDebut: data.dateDebut,
       value: displayValue,
       
       duration: data.Duration || 'Variable',
