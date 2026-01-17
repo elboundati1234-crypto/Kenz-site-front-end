@@ -95,7 +95,7 @@
                         <div class="d-flex flex-column gap-2 mb-3 text-secondary small">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="material-symbols-outlined fs-6 text-primary">event</span>
-                                <span class="fw-medium">{{ item.deadline }}</span>
+                                <span class="fw-medium">{{ item.deadline | date:'dd/MM/yyyy' }}</span>
                             </div>
                             
                             <div class="d-flex align-items-center gap-2">

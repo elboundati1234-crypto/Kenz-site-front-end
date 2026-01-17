@@ -7,7 +7,7 @@
                 <p class="small fw-medium text-slate-500 mb-1">Application Deadline</p>
                 <p class="h5 fw-bold text-slate-900 d-flex align-items-center gap-2">
                     <span class="material-symbols-outlined text-primary-custom">calendar_clock</span>
-                    {{ opportunity.deadline }}
+                    {{ opportunity.deadline | date:'dd/MM/yyyy' }}
                 </p>
             </div>
             <div class="d-flex gap-2">
