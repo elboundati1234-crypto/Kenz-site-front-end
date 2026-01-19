@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, Mail, Lock, Eye, EyeOff, User, Phone, GraduationCap, BookOpen, Globe } from 'lucide-angular';
-import { UserService } from '../../services/user';
-
+import { UserService } from '../../services/user'; // Vérifiez le chemin
 
 @Component({
   selector: 'app-register',
@@ -21,6 +20,7 @@ export class RegisterComponent {
   loading = false;
   errorMessage = '';
 
+  // Icons
   readonly UserIcon = User;
   readonly MailIcon = Mail;
   readonly LockIcon = Lock;
@@ -37,6 +37,7 @@ export class RegisterComponent {
     private router: Router
   ) {
     this.registerForm = this.fb.group({
+      // Étape 1 : Infos de base
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -44,136 +45,118 @@ export class RegisterComponent {
       confirmPassword: ['', Validators.required],
       studyLevel: ['', Validators.required],
       studyDomain: ['', Validators.required],
+      
+      // Étape 2 : Infos complémentaires
       phone: [''],
       targetCountries: [''],
       secondaryDomain: [''],
-      acceptTerms: [false],
+      acceptTerms: [false, Validators.requiredTrue],
       acceptNotifications: [false]
     }, { validators: this.passwordMatchValidator });
   }
 
+  // Validateur personnalisé pour comparer les mots de passe
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password');
     const confirmPassword = control.get('confirmPassword');
-
-    if (!password || !confirmPassword) {
-      return null;
-    }
-
-    if (confirmPassword.value === '') {
-      return null;
-    }
-
+    
+    if (!password || !confirmPassword) return null;
+    if (confirmPassword.value === '') return null;
+    
     if (password.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
     } else {
+      // Nettoyage de l'erreur si ça correspond
       const errors = confirmPassword.errors;
       if (errors) {
         delete errors['passwordMismatch'];
-        if (Object.keys(errors).length === 0) {
-          confirmPassword.setErrors(null);
-        }
+        if (Object.keys(errors).length === 0) confirmPassword.setErrors(null);
       }
       return null;
     }
   }
 
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
+  togglePassword() { this.showPassword = !this.showPassword; }
+  toggleConfirmPassword() { this.showConfirmPassword = !this.showConfirmPassword; }
 
-  toggleConfirmPassword() {
-    this.showConfirmPassword = !this.showConfirmPassword;
-  }
-
+  // Vérification Étape 1
   isStep1Valid(): boolean {
     const step1Controls = ['firstName', 'lastName', 'email', 'password', 'confirmPassword', 'studyLevel', 'studyDomain'];
-    return step1Controls.every(controlName => {
-      const control = this.registerForm.get(controlName);
-      return control && control.valid;
-    });
+    // Vérifie si tous les contrôles de l'étape 1 sont valides
+    return step1Controls.every(controlName => this.registerForm.get(controlName)?.valid);
   }
 
+  // Vérification Étape 2
   isStep2Valid(): boolean {
-    const phone = this.registerForm.get('phone')?.value;
-    const targetCountries = this.registerForm.get('targetCountries')?.value;
-    const secondaryDomain = this.registerForm.get('secondaryDomain')?.value;
-    const acceptTerms = this.registerForm.get('acceptTerms')?.value;
-    const acceptNotifications = this.registerForm.get('acceptNotifications')?.value;
-
-    return phone && targetCountries && secondaryDomain && acceptTerms && acceptNotifications;
+    // Le plus important ici est d'avoir accepté les conditions
+    return this.registerForm.get('acceptTerms')?.value === true;
   }
 
+  // Passage à l'étape suivante
   nextStep() {
     if (this.isStep1Valid()) {
       this.currentStep = 2;
     } else {
-      Object.keys(this.registerForm.controls).forEach(key => {
-        const control = this.registerForm.get(key);
-        if (control) {
-          control.markAsTouched();
-        }
-      });
+      // Affiche les erreurs rouges si l'utilisateur essaie de passer sans remplir
+      this.registerForm.markAllAsTouched();
     }
   }
 
-  async skipAdditionalInfo() {
+  // Bouton "Passer" (Skip)
+  skipAdditionalInfo() {
+    // On lance l'inscription sans les données de l'étape 2 (sauf celles de base)
+    this.performRegistration(false);
+  }
+
+  // Bouton "S'inscrire" (Submit final)
+  onSubmit() {
+    if (this.currentStep === 2 && this.isStep2Valid()) {
+      this.performRegistration(true);
+    } else {
+      // Affiche les erreurs (ex: Terms not accepted)
+      this.registerForm.markAllAsTouched();
+    }
+  }
+
+  // Logique d'appel à l'API
+  private performRegistration(includeProfileData: boolean) {
     this.loading = true;
     this.errorMessage = '';
 
-    try {
-      const formValue = this.registerForm.value;
-      await this.userService.signUp({
-        email: formValue.email,
-        password: formValue.password,
-        firstName: formValue.firstName,
-        lastName: formValue.lastName,
-        studyLevel: formValue.studyLevel,
-        studyDomain: formValue.studyDomain,
-        acceptTerms: false,
-        acceptNotifications: false
-      });
-      this.router.navigate(['/dashboard']);
-    } catch (error: any) {
-      this.errorMessage = error.message || 'Une erreur est survenue lors de l\'inscription';
-      console.error('Registration error:', error);
-    } finally {
-      this.loading = false;
-    }
-  }
+    const formValue = this.registerForm.value;
 
-  async onSubmit() {
-    if (this.currentStep === 2 && this.isStep2Valid()) {
-      this.loading = true;
-      this.errorMessage = '';
-
-      try {
-        const formValue = this.registerForm.value;
-        const targetCountriesArray = formValue.targetCountries
-          ? formValue.targetCountries.split(',').map((country: string) => country.trim())
-          : [];
-
-        await this.userService.signUp({
-          email: formValue.email,
-          password: formValue.password,
-          firstName: formValue.firstName,
-          lastName: formValue.lastName,
-          studyLevel: formValue.studyLevel,
-          studyDomain: formValue.studyDomain,
+    // Préparation de l'objet pour l'API
+    const registerData = {
+      firstName: formValue.firstName,
+      lastName: formValue.lastName,
+      email: formValue.email,
+      password: formValue.password,
+      confirmPassword: formValue.confirmPassword,
+      educationLevel: formValue.studyLevel, // Mapping important : studyLevel -> educationLevel
+      studyDomain: formValue.studyDomain,
+      
+      // Si on inclut l'étape 2, on ajoute les champs optionnels
+      ...(includeProfileData && {
           phone: formValue.phone,
           secondaryDomain: formValue.secondaryDomain,
-          targetCountries: targetCountriesArray,
-          acceptTerms: formValue.acceptTerms,
-          acceptNotifications: formValue.acceptNotifications
-        });
-        this.router.navigate(['/dashboard']);
-      } catch (error: any) {
-        this.errorMessage = error.message || 'Une erreur est survenue lors de l\'inscription';
-        console.error('Registration error:', error);
-      } finally {
+          // Transformation de la chaine "Pays1, Pays2" en tableau si nécessaire
+          destinationContinent: formValue.targetCountries // Assurez-vous que le nom correspond à votre API
+      })
+    };
+
+    this.userService.register(registerData).subscribe({
+      next: (response) => {
+        console.log('Registration success:', response);
         this.loading = false;
+        // Redirection vers le login après succès
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Registration error:', err);
+        this.errorMessage = err.error?.message || "Une erreur est survenue lors de l'inscription.";
       }
-    }
+    });
   }
 }
