@@ -1,11 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core'; // 1. Importer ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { LucideAngularModule, Mail, Lock, Eye, EyeOff } from 'lucide-angular';
 import { UserService } from '../../services/user';
-
-
 
 @Component({
   selector: 'app-login',
@@ -28,8 +26,8 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
-
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef // 2. L'injecter ici
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -41,21 +39,30 @@ export class LoginComponent {
     this.showPassword = !this.showPassword;
   }
 
-  async onSubmit() {
+  onSubmit() {
     if (this.loginForm.valid) {
       this.loading = true;
       this.errorMessage = '';
 
-      try {
-        const { email, password } = this.loginForm.value;
-        await this.userService.signIn(email, password);
-        this.router.navigate(['/dashboard']);
-      } catch (error: any) {
-        this.errorMessage = 'Email ou mot de passe incorrect';
-        console.error('Login error:', error);
-      } finally {
-        this.loading = false;
-      }
+      const credentials = this.loginForm.value;
+
+      this.userService.login(credentials).subscribe({
+        next: (response) => {
+          this.loading = false;
+          console.log('Login success', response);
+          this.router.navigate(['/']); 
+          this.cdr.detectChanges(); // 3. FORCER LA MISE À JOUR ICI
+        },
+        error: (err) => {
+          this.loading = false; // Arrête le spinner
+          console.error('Login Error', err);
+          this.errorMessage = err.error?.message || 'Email ou mot de passe incorrect.';
+          
+          this.cdr.detectChanges(); // 4. ET FORCER LA MISE À JOUR ICI AUSSI
+        }
+      });
+    } else {
+      this.loginForm.markAllAsTouched();
     }
   }
 }
