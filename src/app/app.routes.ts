@@ -6,6 +6,7 @@ import { EventsComponent } from './pages/events/events';
 import { ScholarshipsComponent } from './pages/scholarships/scholarships';
 import { ScholarshipDetailsComponent } from './pages/scholarship-details/scholarship-details';
 import { TrainingsComponent } from './pages/trainings/trainings';
+import { Profiles } from './pages/profiles/profiles';
 
 export const routes: Routes = [
   // Home
@@ -19,6 +20,8 @@ export const routes: Routes = [
   // Auth
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'profile-user', component: Profiles },
+
 
   // Scholarships
   {

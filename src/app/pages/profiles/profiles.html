@@ -1,0 +1,112 @@
+<div class="container mt-5" *ngIf="!loading">
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+
+      <h4 class="mb-3">My Profile</h4>
+
+      <!-- Profile Completion -->
+      <div class="mb-4">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="fw-semibold">Profile Completion</span>
+            <span class="fw-bold text-primary">{{ profileCompletion }}%</span>
+          </div>
+        
+          <div class="progress profile-progress">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              [style.width.%]="profileCompletion"
+              [class.bg-success]="profileCompletion === 100"
+              [class.bg-primary]="profileCompletion < 100"
+            ></div>
+          </div>
+        </div>
+        
+
+      <form [formGroup]="profileForm" (ngSubmit)="submit()">
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>First Name</label>
+            <input class="form-control" formControlName="firstName">
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label>Last Name</label>
+            <input class="form-control" formControlName="lastName">
+          </div>
+        </div>
+
+
+        <hr>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="educationLevel">Education Level</label>
+            <select id="educationLevel" class="form-select" formControlName="educationLevel">
+              <option value="">Select a level</option>
+              <option value="Licence">Bachelor's</option>
+              <option value="Master">Master's</option>
+              <option value="Doctorat">PhD</option>
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="studyDomain">Study Domain</label>
+            <select id="studyDomain" class="form-select" formControlName="studyDomain">
+              <option value="">Select a domain</option>
+              <option value="Informatique">Computer Science</option>
+              <option value="Droit">Law</option>
+              <option value="Médecine">Medicine</option>
+              <option value="Économie">Economics</option>
+              <option value="Ingénierie">Engineering</option>
+              <option value="Sciences Humaines">Humanities</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label>Phone</label>
+            <input class="form-control" formControlName="phone">
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label>Destination Continent</label>
+            <input class="form-control" formControlName="destinationContinent">
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="secondaryDomain">Secondary Domain</label>
+          <select id="secondaryDomain" class="form-select" formControlName="secondaryDomain">
+            <option value="">Select a secondary domain</option>
+            <option value="Informatique">Computer Science</option>
+            <option value="Droit">Law</option>
+            <option value="Médecine">Medicine</option>
+            <option value="Économie">Economics</option>
+            <option value="Ingénierie">Engineering</option>
+            <option value="Sciences Humaines">Humanities</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary w-100">
+          {{ isFirstCompletion ? 'Complete Profile' : 'Update Profile' }}
+        </button>
+
+      </form>
+      <!-- Add this to your profiles.html -->
+<div *ngIf="loading" class="text-center p-5">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div class="container mt-5" *ngIf="!loading">
+  <!-- Your existing content -->
+</div>
+
+    </div>
+  </div>
+</div>

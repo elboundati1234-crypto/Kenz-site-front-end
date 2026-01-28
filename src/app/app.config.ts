@@ -1,13 +1,25 @@
 import { ApplicationConfig, LOCALE_ID } from '@angular/core';
-import { provideRouter, withComponentInputBinding, withRouterConfig, withViewTransitions } from '@angular/router';
-import { routes } from './app.routes';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { authInterceptor } from './interceptors/auth-interceptor';
 
-// 1. IMPORTS NÉCESSAIRES POUR LA DATE FR
+import {
+  provideRouter,
+  withComponentInputBinding,
+  withRouterConfig,
+  withViewTransitions
+} from '@angular/router';
+import { routes } from './app.routes';
+
+import {
+  provideHttpClient,
+  withFetch,
+  withInterceptors
+} from '@angular/common/http';
+
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
 
-// 2. ENREGISTREMENT DE LA LANGUE
+
+// Register French locale
 registerLocaleData(localeFr);
 
 export const appConfig: ApplicationConfig = {
@@ -16,11 +28,14 @@ export const appConfig: ApplicationConfig = {
       routes,
       withComponentInputBinding(),
       withViewTransitions(),
-      withRouterConfig({ onSameUrlNavigation: 'reload' }) 
+      withRouterConfig({ onSameUrlNavigation: 'reload' })
     ),
-    provideHttpClient(withFetch()), // <-- J'ai ajouté la virgule ici qui manquait
-    
-    // 3. CONFIGURATION GLOBALE
+
+    provideHttpClient(
+      withFetch(),
+      withInterceptors([authInterceptor])
+    ),
+
     { provide: LOCALE_ID, useValue: 'fr-FR' }
   ]
 };

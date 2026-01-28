@@ -1,8 +1,8 @@
 <div class="min-vh-100 d-flex align-items-center justify-content-center px-3 py-5">
   <div style="max-width: 640px; width: 100%;">
     <div class="text-center mb-5">
-      <h1 class="h2 fw-bold text-dark mb-2">ScholarHub</h1>
-      <p class="text-secondary">Créez votre compte</p>
+      <h1 class="h2 fw-bold text-dark mb-2">Kenz</h1>
+      <p class="text-secondary">Create your account</p>
     </div>
 
     <div class="bg-white rounded-3 shadow-sm p-5">
@@ -19,7 +19,7 @@
               1
             </div>
             <span class="small fw-500" [class.text-primary]="currentStep === 1" [class.text-secondary]="currentStep !== 1">
-              Informations de base
+              Basic Information
             </span>
           </div>
           <div class="flex-grow-1 mx-2" style="height: 2px; background-color: #e5e7eb;"></div>
@@ -34,18 +34,18 @@
               2
             </div>
             <span class="small fw-500" [class.text-primary]="currentStep === 2" [class.text-secondary]="currentStep !== 2">
-              Informations supplémentaires
+              Additional Information
             </span>
           </div>
         </div>
-        <p class="text-center text-secondary small mt-3 mb-0">Étape {{ currentStep }} sur 2</p>
+        <p class="text-center text-secondary small mt-3 mb-0">Step {{ currentStep }} of 2</p>
       </div>
 
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
         <div *ngIf="currentStep === 1">
           <div class="row g-3 mb-4">
             <div class="col-12 col-md-6">
-              <label for="lastName" class="form-label fw-500">Nom <span class="text-danger">*</span></label>
+              <label for="lastName" class="form-label fw-500">Last Name <span class="text-danger">*</span></label>
               <div class="input-group">
                 <span class="input-group-text border-0 bg-light">
                   <lucide-icon [img]="UserIcon" class="text-secondary" style="width: 20px; height: 20px;"></lucide-icon>
@@ -55,16 +55,16 @@
                   type="text"
                   formControlName="lastName"
                   class="form-control border-0 bg-light"
-                  placeholder="Dupont"
+                  placeholder="Doe"
                 />
               </div>
               <div *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched" class="mt-2 text-danger small">
-                Le nom est requis
+                Last name is required
               </div>
             </div>
 
             <div class="col-12 col-md-6">
-              <label for="firstName" class="form-label fw-500">Prénom <span class="text-danger">*</span></label>
+              <label for="firstName" class="form-label fw-500">First Name <span class="text-danger">*</span></label>
               <div class="input-group">
                 <span class="input-group-text border-0 bg-light">
                   <lucide-icon [img]="UserIcon" class="text-secondary" style="width: 20px; height: 20px;"></lucide-icon>
@@ -74,11 +74,11 @@
                   type="text"
                   formControlName="firstName"
                   class="form-control border-0 bg-light"
-                  placeholder="Jean"
+                  placeholder="John"
                 />
               </div>
               <div *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched" class="mt-2 text-danger small">
-                Le prénom est requis
+                First name is required
               </div>
             </div>
           </div>
@@ -94,16 +94,16 @@
                 type="email"
                 formControlName="email"
                 class="form-control border-0 bg-light"
-                placeholder="jean.dupont@email.com"
+                placeholder="john.doe@email.com"
               />
             </div>
             <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="mt-2 text-danger small">
-              Veuillez entrer une adresse email valide
+              Please enter a valid email address
             </div>
           </div>
 
           <div class="mb-4">
-            <label for="password" class="form-label fw-500">Mot de passe <span class="text-danger">*</span></label>
+            <label for="password" class="form-label fw-500">Password <span class="text-danger">*</span></label>
             <div class="input-group">
               <span class="input-group-text border-0 bg-light">
                 <lucide-icon [img]="LockIcon" class="text-secondary" style="width: 20px; height: 20px;"></lucide-icon>
@@ -128,12 +128,12 @@
               </button>
             </div>
             <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="mt-2 text-danger small">
-              Le mot de passe doit contenir au moins 6 caractères
+              Password must be at least 6 characters long
             </div>
           </div>
 
           <div class="mb-4">
-            <label for="confirmPassword" class="form-label fw-500">Confirmer le mot de passe <span class="text-danger">*</span></label>
+            <label for="confirmPassword" class="form-label fw-500">Confirm Password <span class="text-danger">*</span></label>
             <div class="input-group">
               <span class="input-group-text border-0 bg-light">
                 <lucide-icon [img]="LockIcon" class="text-secondary" style="width: 20px; height: 20px;"></lucide-icon>
@@ -159,16 +159,16 @@
             </div>
             <div *ngIf="registerForm.get('confirmPassword')?.invalid && registerForm.get('confirmPassword')?.touched" class="mt-2 text-danger small">
               <span *ngIf="registerForm.get('confirmPassword')?.hasError('required')">
-                La confirmation du mot de passe est requise
+                Password confirmation is required
               </span>
               <span *ngIf="registerForm.get('confirmPassword')?.hasError('passwordMismatch')">
-                Les mots de passe ne correspondent pas
+                Passwords do not match
               </span>
             </div>
           </div>
 
           <div class="mb-4">
-            <label for="studyLevel" class="form-label fw-500">Niveau d'étude <span class="text-danger">*</span></label>
+            <label for="studyLevel" class="form-label fw-500">Study Level <span class="text-danger">*</span></label>
             <div class="input-group">
               <span class="input-group-text border-0 bg-light">
                 <lucide-icon [img]="GraduationCapIcon" class="text-secondary" style="width: 20px; height: 20px;"></lucide-icon>
@@ -178,19 +178,19 @@
                 formControlName="studyLevel"
                 class="form-select border-0 bg-light"
               >
-                <option value="">Sélectionnez un niveau</option>
-                <option value="Licence">Licence</option>
-                <option value="Master">Master</option>
-                <option value="Doctorat">Doctorat</option>
+                <option value="">Select a level</option>
+                <option value="Licence">Bachelor's</option>
+                <option value="Master">Master's</option>
+                <option value="Doctorat">PhD</option>
               </select>
             </div>
             <div *ngIf="registerForm.get('studyLevel')?.invalid && registerForm.get('studyLevel')?.touched" class="mt-2 text-danger small">
-              Le niveau d'étude est requis
+              Study level is required
             </div>
           </div>
 
           <div class="mb-4">
-            <label for="studyDomain" class="form-label fw-500">Domaine d'étude <span class="text-danger">*</span></label>
+            <label for="studyDomain" class="form-label fw-500">Study Domain <span class="text-danger">*</span></label>
             <div class="input-group">
               <span class="input-group-text border-0 bg-light">
                 <lucide-icon [img]="BookOpenIcon" class="text-secondary" style="width: 20px; height: 20px;"></lucide-icon>
@@ -200,17 +200,17 @@
                 formControlName="studyDomain"
                 class="form-select border-0 bg-light"
               >
-                <option value="">Sélectionnez un domaine</option>
-                <option value="Informatique">Informatique</option>
-                <option value="Droit">Droit</option>
-                <option value="Médecine">Médecine</option>
-                <option value="Économie">Économie</option>
-                <option value="Ingénierie">Ingénierie</option>
-                <option value="Sciences Humaines">Sciences Humaines</option>
+                <option value="">Select a domain</option>
+                <option value="Informatique">Computer Science</option>
+                <option value="Droit">Law</option>
+                <option value="Médecine">Medicine</option>
+                <option value="Économie">Economics</option>
+                <option value="Ingénierie">Engineering</option>
+                <option value="Sciences Humaines">Humanities</option>
               </select>
             </div>
             <div *ngIf="registerForm.get('studyDomain')?.invalid && registerForm.get('studyDomain')?.touched" class="mt-2 text-danger small">
-              Le domaine d'étude est requis
+              Study domain is required
             </div>
           </div>
 
@@ -221,14 +221,14 @@
               [disabled]="!isStep1Valid()"
               class="btn btn-primary px-4"
             >
-              Suivant
+              Next
             </button>
           </div>
         </div>
 
         <div *ngIf="currentStep === 2">
           <div class="mb-4">
-            <label for="phone" class="form-label fw-500">Numéro de téléphone</label>
+            <label for="phone" class="form-label fw-500">Phone Number</label>
             <div class="input-group">
               <span class="input-group-text border-0 bg-light">
                 <lucide-icon [img]="PhoneIcon" class="text-secondary" style="width: 20px; height: 20px;"></lucide-icon>
@@ -244,7 +244,7 @@
           </div>
 
           <div class="mb-4">
-            <label for="targetCountries" class="form-label fw-500">Liste des pays destinés</label>
+            <label for="targetCountries" class="form-label fw-500">Target Countries</label>
             <div class="input-group">
               <span class="input-group-text border-0 bg-light">
                 <lucide-icon [img]="GlobeIcon" class="text-secondary" style="width: 20px; height: 20px;"></lucide-icon>
@@ -254,13 +254,13 @@
                 type="text"
                 formControlName="targetCountries"
                 class="form-control border-0 bg-light"
-                placeholder="France, Canada, Allemagne (séparés par des virgules)"
+                placeholder="France, Canada, Germany (separated by commas)"
               />
             </div>
           </div>
 
           <div class="mb-4">
-            <label for="secondaryDomain" class="form-label fw-500">Domaine secondaire</label>
+            <label for="secondaryDomain" class="form-label fw-500">Secondary Domain</label>
             <div class="input-group">
               <span class="input-group-text border-0 bg-light">
                 <lucide-icon [img]="BookOpenIcon" class="text-secondary" style="width: 20px; height: 20px;"></lucide-icon>
@@ -270,13 +270,13 @@
                 formControlName="secondaryDomain"
                 class="form-select border-0 bg-light"
               >
-                <option value="">Sélectionnez un domaine secondaire</option>
-                <option value="Informatique">Informatique</option>
-                <option value="Droit">Droit</option>
-                <option value="Médecine">Médecine</option>
-                <option value="Économie">Économie</option>
-                <option value="Ingénierie">Ingénierie</option>
-                <option value="Sciences Humaines">Sciences Humaines</option>
+                <option value="">Select a secondary domain</option>
+                <option value="Informatique">Computer Science</option>
+                <option value="Droit">Law</option>
+                <option value="Médecine">Medicine</option>
+                <option value="Économie">Economics</option>
+                <option value="Ingénierie">Engineering</option>
+                <option value="Sciences Humaines">Humanities</option>
               </select>
             </div>
           </div>
@@ -290,7 +290,7 @@
                 class="form-check-input"
               />
               <label for="acceptTerms" class="form-check-label small">
-                J'accepte les conditions de confidentialité et les termes d'utilisation
+                I accept the privacy policy and terms of use
               </label>
             </div>
 
@@ -302,7 +302,7 @@
                 class="form-check-input"
               />
               <label for="acceptNotifications" class="form-check-label small">
-                J'accepte de recevoir des notifications par email concernant mes activités
+                I agree to receive email notifications about my activities
               </label>
             </div>
           </div>
@@ -317,14 +317,14 @@
               (click)="skipAdditionalInfo()"
               class="btn btn-outline-secondary flex-grow-1"
             >
-              Ignorer
+              Skip
             </button>
             <button
               type="submit"
               [disabled]="loading || !isStep2Valid()"
               class="btn btn-primary flex-grow-1"
             >
-              {{ loading ? 'Inscription...' : "S'inscrire" }}
+              {{ loading ? 'Registering...' : 'Register' }}
             </button>
           </div>
         </div>
@@ -332,9 +332,9 @@
 
       <div class="text-center mt-4">
         <p class="text-secondary small mb-0">
-          Vous avez déjà un compte ?
+          Already have an account?
           <a routerLink="/login" class="link-primary text-decoration-none fw-500">
-            Se connecter
+            Log in
           </a>
         </p>
       </div>
