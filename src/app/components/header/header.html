@@ -10,59 +10,67 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarContent">
+            
             <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-4 mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-medium" routerLink="/" routerLinkActive="text-primary-custom fw-bold" [routerLinkActiveOptions]="{exact: true}">Home</a>
+                    <a class="nav-link text-dark fw-medium" routerLink="/" routerLinkActive="text-primary-custom fw-bold" [routerLinkActiveOptions]="{exact: true}">
+                        Accueil
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-medium" routerLink="/scholarships" routerLinkActive="text-primary-custom fw-bold">Scholarships</a>
+                    <a class="nav-link text-dark fw-medium" routerLink="/scholarships" routerLinkActive="text-primary-custom fw-bold">
+                        Bourses
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-medium" routerLink="/trainings" routerLinkActive="text-primary-custom fw-bold">Trainings</a>
+                    <a class="nav-link text-dark fw-medium" routerLink="/trainings" routerLinkActive="text-primary-custom fw-bold">
+                        Formations
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark fw-medium" routerLink="/events" routerLinkActive="text-primary-custom fw-bold">Events</a>
+                    <a class="nav-link text-dark fw-medium" routerLink="/events" routerLinkActive="text-primary-custom fw-bold">
+                        Événements
+                    </a>
                 </li>
+                
             </ul>
 
             <div class="d-flex align-items-center gap-2 ms-lg-4 mt-3 mt-lg-0">
                 
                 <ng-container *ngIf="!isLoggedIn">
-                    <a routerLink="/login" class="btn btn-light-custom px-4 rounded-3">Login</a>
-                    <a routerLink="/register" class="btn btn-primary-custom px-4 rounded-3">Sign Up</a>
+                    <a routerLink="/login" class="btn btn-light-custom px-4 rounded-3">Connexion</a>
+                    <a routerLink="/register" class="btn btn-primary-custom px-4 rounded-3">Inscription</a>
                 </ng-container>
 
                 <div *ngIf="isLoggedIn" class="dropdown">
-                    <a class="profile-pill" 
-                       id="profileDropdown" 
-                       data-bs-toggle="dropdown" 
-                       aria-expanded="false">
+                    
+                    <button type="button" 
+                            class="profile-pill btn border-0 d-flex align-items-center p-1" 
+                            id="profileDropdown" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false">
                         
                         <div class="profile-avatar">
-                            <img *ngIf="user?.photoUrl" [src]="user?.photoUrl" alt="Profile">
+                            <img *ngIf="user?.photoUrl" [src]="user?.photoUrl" alt="Profil">
                             <span *ngIf="!user?.photoUrl">{{ user?.initials }}</span>
                         </div>
 
                         <span class="profile-name d-none d-sm-block">{{ user?.fullName }}</span>
                         
                         <span class="material-symbols-outlined text-secondary fs-6 ms-2">expand_more</span>
-                    </a>
+                    </button>
 
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2" aria-labelledby="profileDropdown">
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2 mt-2" aria-labelledby="profileDropdown">
                         <li>
                             <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2" routerLink="/profile-user">
-                                <span class="material-symbols-outlined fs-5">person</span> My Profile
+                                <span class="material-symbols-outlined fs-5">person</span> Mon Profil
                             </a>
                         </li>
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2" routerLink="/dashboard">
-                                <span class="material-symbols-outlined fs-5">dashboard</span> Dashboard
-                            </a>
-                        </li>
+                        
                         <li><hr class="dropdown-divider my-2"></li>
                         <li>
                             <button class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2 text-danger" (click)="logout()">
-                                <span class="material-symbols-outlined fs-5">logout</span> Logout
+                                <span class="material-symbols-outlined fs-5">logout</span> Déconnexion
                             </button>
                         </li>
                     </ul>

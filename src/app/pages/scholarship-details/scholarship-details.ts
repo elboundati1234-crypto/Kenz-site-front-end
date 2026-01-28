@@ -58,13 +58,13 @@ export class ScholarshipDetailsComponent implements OnInit {
         if (this.opportunity) {
           
           if (this.opportunity.type === 'Training') {
-            this.sectionTitle = 'Trainings';
+            this.sectionTitle = 'Formations';
             this.listLink = '/trainings';
           } else if (this.opportunity.type === 'Event') {
-            this.sectionTitle = 'Events';
+            this.sectionTitle = 'Événements';
             this.listLink = '/events';
           } else {
-            this.sectionTitle = 'Scholarships';
+            this.sectionTitle = 'Bourses';
             this.listLink = '/scholarships';
           }
           

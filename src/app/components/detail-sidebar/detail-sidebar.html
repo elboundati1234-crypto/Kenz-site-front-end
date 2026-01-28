@@ -4,7 +4,7 @@
         
         <div class="d-flex justify-content-between align-items-start mb-4">
             <div>
-                <p class="small fw-medium text-slate-500 mb-1">Application Deadline</p>
+                <p class="small fw-medium text-slate-500 mb-1">Date limite</p>
                 <p class="h5 fw-bold text-slate-900 d-flex align-items-center gap-2">
                     <span class="material-symbols-outlined text-primary-custom">calendar_clock</span>
                     {{ opportunity.deadline | date:'dd/MM/yyyy' }}
@@ -27,17 +27,18 @@
                     <span class="material-symbols-outlined">payments</span>
                 </div>
                 <div>
-                    <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Value</p>
+                    <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Valeur</p>
                     <p class="small fw-bold text-slate-900 mb-0">{{ opportunity.value }}</p>
                 </div>
             </div>
 
             <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background-color: #f8fafc;" 
-                 *ngIf="opportunity.value"> <div class="rounded-circle d-flex align-items-center justify-content-center text-success" style="width: 2.5rem; height: 2.5rem; background-color: #dcfce7;">
+                 *ngIf="opportunity.value"> 
+                 <div class="rounded-circle d-flex align-items-center justify-content-center text-success" style="width: 2.5rem; height: 2.5rem; background-color: #dcfce7;">
                     <span class="material-symbols-outlined">schedule</span>
                 </div>
                 <div>
-                    <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Duration</p>
+                    <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Durée</p>
                     <p class="small fw-bold text-slate-900 mb-0">{{ opportunity.duration }}</p>
                 </div>
             </div>
@@ -47,37 +48,38 @@
                    <span class="material-symbols-outlined">location_on</span>
                </div>
                <div>
-                   <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Location</p>
+                   <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Lieu</p>
                    <p class="small fw-bold text-slate-900 mb-0">{{ opportunity.location }}</p>
                </div>
            </div>
 
             <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background-color: #f8fafc;" 
-                 *ngIf="opportunity.value"> <div class="rounded-circle d-flex align-items-center justify-content-center text-warning" style="width: 2.5rem; height: 2.5rem; background-color: #fef9c3;">
-                   <span class="material-symbols-outlined">translate</span>
-               </div>
-               <div>
-                   <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Language</p>
-                   <p class="small fw-bold text-slate-900 mb-0">{{ opportunity.language }}</p>
-               </div>
+                 *ngIf="opportunity.value"> 
+                 <div class="rounded-circle d-flex align-items-center justify-content-center text-warning" style="width: 2.5rem; height: 2.5rem; background-color: #fef9c3;">
+                    <span class="material-symbols-outlined">translate</span>
+                </div>
+                <div>
+                    <p class="text-uppercase small fw-semibold text-slate-500 mb-0" style="font-size: 0.75rem;">Langue</p>
+                    <p class="small fw-bold text-slate-900 mb-0">{{ opportunity.language }}</p>
+                </div>
            </div>
 
         </div>
 
         <button class="btn btn-primary-custom w-100 py-3 rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2 mb-2">
-            Apply Now
+            Postuler maintenant
             <span class="material-symbols-outlined" style="font-size: 20px;">open_in_new</span>
         </button>
         <p class="small text-center text-slate-400 mb-0" style="font-size: 0.75rem; color: #64748b;">
-            You will be redirected to the official portal.
+            Vous serez redirigé vers le portail officiel.
         </p>
     </div>
     
     <div style="z-index: 1; position: relative;">
-         <h3 class="small fw-bold text-slate-900 text-uppercase mb-3 px-1">Similar Opportunities</h3>
+         <h3 class="small fw-bold text-slate-900 text-uppercase mb-3 px-1">Opportunités similaires</h3>
          
          <div *ngIf="relatedOpportunities.length === 0" class="alert alert-light text-small">
-           No similar opportunities found.
+           Aucune opportunité similaire trouvée.
          </div>
 
          <div class="d-flex flex-column gap-3">

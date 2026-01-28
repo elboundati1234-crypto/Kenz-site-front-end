@@ -2,8 +2,8 @@
     <div class="container text-center">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <h1 class="display-4 fw-black text-dark mb-3">Find Your Future Funding</h1>
-                <p class="text-secondary fs-5 mb-5">Browse hundreds of scholarships tailored to your academic journey.</p>
+                <h1 class="display-4 fw-black text-dark mb-3">Trouvez le financement de votre avenir</h1>
+                <p class="text-secondary fs-5 mb-5">Parcourez des centaines de bourses adaptées à votre parcours académique.</p>
                 
                 <div class="row justify-content-center">
                     <div class="col-md-10 col-lg-8">
@@ -12,11 +12,11 @@
                                 <span class="material-symbols-outlined text-secondary">search</span>
                             </span>
                             <input type="text" class="form-control border-0 shadow-none" 
-                                   placeholder="Search by name, keyword..."
+                                   placeholder="Rechercher par nom, mot-clé..."
                                    [(ngModel)]="searchTerm"
                                    (input)="onSearch()"
                                    (keyup.enter)="onSearch()">
-                            <button class="btn btn-primary-custom px-4 m-1 rounded-3" type="button" (click)="onSearch()">Search</button>
+                            <button class="btn btn-primary-custom px-4 m-1 rounded-3" type="button" (click)="onSearch()">Rechercher</button>
                         </div>
                     </div>
                 </div>
@@ -39,18 +39,18 @@
             
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
                 <div>
-                    <h2 class="h4 fw-bold mb-0">Available Scholarships</h2>
-                    <p *ngIf="!isLoading" class="text-secondary small mb-0">Showing {{ filteredScholarships.length }} results</p>
+                    <h2 class="h4 fw-bold mb-0">Bourses disponibles</h2>
+                    <p *ngIf="!isLoading" class="text-secondary small mb-0">Affichage de {{ filteredScholarships.length }} résultats</p>
                 </div>
 
                 <div class="d-flex align-items-center">
-                    <span class="text-secondary me-2 small fw-medium">Sort by:</span>
+                    <span class="text-secondary me-2 small fw-medium">Trier par :</span>
                     <select class="form-select form-select-sm border-0 bg-light fw-bold text-dark w-auto" 
                             style="min-width: 140px; cursor: pointer;"
                             [(ngModel)]="sortOption" 
                             (change)="onSortChange()">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
+                        <option value="newest">Plus récents</option>
+                        <option value="oldest">Plus anciens</option>
                     </select>
                 </div>
             </div>
@@ -67,7 +67,7 @@
                 <button class="btn btn-link text-decoration-none p-0 ms-2 small fw-bold" 
                         style="font-size: 0.85rem;" 
                         (click)="handleReset()">
-                    Clear all
+                    Tout effacer
                 </button>
             </div>
 
@@ -75,14 +75,14 @@
                 <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="mt-3 text-secondary fw-medium">Searching for scholarships...</p>
+                <p class="mt-3 text-secondary fw-medium">Recherche de bourses en cours...</p>
             </div>
 
             <div *ngIf="!isLoading && filteredScholarships.length === 0" class="alert alert-light text-center py-5">
                 <span class="material-symbols-outlined fs-1 text-secondary mb-3">search_off</span>
-                <h4 class="h5 fw-bold">No scholarships found</h4>
-                <p class="text-secondary">Try adjusting your filters.</p>
-                <button class="btn btn-outline-primary btn-sm mt-2" (click)="handleReset()">Reset Filters</button>
+                <h4 class="h5 fw-bold">Aucune bourse trouvée</h4>
+                <p class="text-secondary">Essayez d'ajuster vos filtres.</p>
+                <button class="btn btn-outline-primary btn-sm mt-2" (click)="handleReset()">Réinitialiser les filtres</button>
             </div>
 
             <div *ngIf="!isLoading && filteredScholarships.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
