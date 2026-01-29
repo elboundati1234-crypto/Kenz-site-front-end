@@ -94,17 +94,28 @@ export class UserService {
   // PUT http://localhost:3000/api/auth/profile/:userId
   // ==========================================================
   updateProfile(userId: string, data: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/profile/${userId}`, data).pipe(
-      tap(response => {
-        // Optionnel : Mettre à jour l'utilisateur local si les infos changent
-        const currentUser = this.currentUserSubject.value;
-        if (currentUser) {
-          const updatedUser = { ...currentUser, ...data }; // Fusion simple
-          this.saveUserToStorage(updatedUser);
-        }
-      })
-    );
-  }
+  return this.http.put<any>(`${this.apiUrl}/profile/${userId}`, data).pipe(
+    tap(() => {
+      const currentUser = this.currentUserSubject.value;
+      if (currentUser) {
+
+        const firstName = data.firstName ?? currentUser.firstName;
+        const lastName = data.lastName ?? currentUser.lastName;
+
+        const updatedUser: User = {
+          ...currentUser,
+          ...data,
+          firstName,
+          lastName,
+          fullName: `${firstName} ${lastName}`,     // ✅ IMPORTANT
+          initials: this.getInitials(firstName, lastName) // ✅ IMPORTANT
+        };
+
+        this.saveUserToStorage(updatedUser);
+      }
+    })
+  );
+}
 
   // ==========================================================
   // LOGOUT
