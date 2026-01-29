@@ -42,40 +42,52 @@
                     <a routerLink="/register" class="btn btn-primary-custom px-4 rounded-3">Inscription</a>
                 </ng-container>
 
-                <div *ngIf="isLoggedIn" class="dropdown">
-                    
-                    <button type="button" 
-                            class="profile-pill btn border-0 d-flex align-items-center p-1" 
-                            id="profileDropdown" 
-                            data-bs-toggle="dropdown" 
-                            aria-expanded="false">
-                        
-                        <div class="profile-avatar">
-                            <img *ngIf="user?.photoUrl" [src]="user?.photoUrl" alt="Profil">
-                            <span *ngIf="!user?.photoUrl">{{ user?.initials }}</span>
-                        </div>
+              <div *ngIf="isLoggedIn" class="dropdown">
+          <!-- Avatar + toggle -->
+          <a class="profile-pill d-flex align-items-center gap-2"
+             id="profileDropdown" 
+             data-bs-toggle="dropdown" 
+             aria-expanded="false">
+            
+            <div class="profile-avatar d-flex align-items-center justify-content-center text-light"
+                 [ngStyle]="{
+                   'border': '7px solid ' + (user?.profileCompletion === 100 ? 'rgb(91 192 114)' : '#f7f292eb'),
+                   'width': '50px',
+                   'height': '50px',
+                   'font-weight': 'bold',
+                   'font-size': '1rem'
+                 }">
+              <img *ngIf="user?.photoUrl" [src]="user?.photoUrl" alt="Profile" class="w-100 h-100">
+              <span *ngIf="!user?.photoUrl">
+                {{ (user?.firstName?.charAt(0) || '') + (user?.lastName?.charAt(0) || '') }}
+              </span>
+            </div>
 
-                        <span class="profile-name d-none d-sm-block">{{ user?.fullName }}</span>
-                        
-                        <span class="material-symbols-outlined text-secondary fs-6 ms-2">expand_more</span>
-                    </button>
+            <span class="profile-name d-none d-sm-block">{{ user?.fullName }}</span>
+            <span class="material-symbols-outlined text-secondary fs-6 ms-2">expand_more</span>
+          </a>
 
-                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2 mt-2" aria-labelledby="profileDropdown">
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2" routerLink="/profile-user">
-                                <span class="material-symbols-outlined fs-5">person</span> Mon Profil
-                            </a>
-                        </li>
-                        
-                        <li><hr class="dropdown-divider my-2"></li>
-                        <li>
-                            <button class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2 text-danger" (click)="logout()">
-                                <span class="material-symbols-outlined fs-5">logout</span> Déconnexion
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-
+          <!-- Dropdown menu -->
+          <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-2" aria-labelledby="profileDropdown">
+            <li>
+              <!-- Lien direct vers profil -->
+              <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2" [routerLink]="['/profile-user']">
+                <span class="material-symbols-outlined fs-5">person</span> My Profile
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2" [routerLink]="['/dashboard']">
+                <span class="material-symbols-outlined fs-5">dashboard</span> Dashboard
+              </a>
+            </li>
+            <li><hr class="dropdown-divider my-2"></li>
+            <li>
+              <button class="dropdown-item d-flex align-items-center gap-2 py-2 rounded-2 text-danger" (click)="logout()">
+                <span class="material-symbols-outlined fs-5">logout</span> Logout
+              </button>
+            </li>
+          </ul>
+        </div>
             </div>
         </div>
     </div>
