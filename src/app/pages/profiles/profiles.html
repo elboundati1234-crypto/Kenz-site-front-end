@@ -165,12 +165,22 @@
                                 </div>
                             </div>
 
+                            <div class="d-flex gap-3 mt-4">
+                            <!-- Bouton Finaliser / Mettre à jour -->
                             <button type="submit" 
-                                    class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2"
+                                    class="btn btn-primary flex-fill py-3 fw-bold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2"
                                     style="background-color: var(--primary-custom); border: none;">
                                 <lucide-angular [img]="AwardIcon" size="20"></lucide-angular>
                                 {{ isFirstCompletion ? 'Finaliser mon Profil' : 'Mettre à jour' }}
                             </button>
+
+                            <!-- Bouton Ignorer -->
+                            <a routerLink="/home"
+                            class="btn btn-outline-secondary flex-fill py-3 fw-bold rounded-3 d-flex align-items-center justify-content-center">
+                                Ignorer
+                            </a>
+                        </div>
+
 
                         </form>
 

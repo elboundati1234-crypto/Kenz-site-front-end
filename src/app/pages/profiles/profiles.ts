@@ -117,11 +117,13 @@ export class Profiles implements OnInit {
     };
 
     // Maintenant TypeScript est content car on a vérifié que user n'est pas null
-    this.userService.updateProfile(this.user.id, payload).subscribe({
+  this.userService.updateProfile(this.user.id, payload).subscribe({
         next: (res) => {
             console.log('Profil mis à jour', res);
             this.profileCompletion = completion;
             this.cdr.detectChanges();
+            this.router.navigate(['/home']);
+
         },
         error: (err) => console.error(err)
     });
