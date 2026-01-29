@@ -1,6 +1,6 @@
 <div class="mb-4">
     <h3 class="h6 fw-bold mb-3 d-flex justify-content-between align-items-center">
-        Category
+        Catégorie
         <span class="material-symbols-outlined text-secondary fs-6">expand_less</span>
     </h3>
     <div class="d-flex flex-column gap-2">
@@ -8,7 +8,7 @@
         <div class="form-check d-flex align-items-center p-0 mb-0">
             <input class="form-check-input mt-0 me-3" type="checkbox" id="subDev" 
                    [(ngModel)]="filters.development" (change)="onFilterChange()">
-            <label class="form-check-label flex-grow-1" for="subDev">Development</label>
+            <label class="form-check-label flex-grow-1" for="subDev">Développement</label>
         </div>
 
         <div class="form-check d-flex align-items-center p-0 mb-0">
@@ -38,38 +38,38 @@
         <div class="form-check">
             <input class="form-check-input" type="radio" name="format" value="All" id="fmtAll" 
                    [(ngModel)]="filters.format" (change)="onFilterChange()">
-            <label class="form-check-label" for="fmtAll">All Formats</label>
+            <label class="form-check-label" for="fmtAll">Tous les formats</label>
         </div>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="format" value="Online" id="fmtOnline" 
                    [(ngModel)]="filters.format" (change)="onFilterChange()">
-            <label class="form-check-label" for="fmtOnline">Online</label>
+            <label class="form-check-label" for="fmtOnline">En ligne</label>
         </div>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="format" value="In Person" id="fmtPerson" 
                    [(ngModel)]="filters.format" (change)="onFilterChange()">
-            <label class="form-check-label" for="fmtPerson">In Person</label>
+            <label class="form-check-label" for="fmtPerson">Présentiel</label>
         </div>
     </div>
 </div>
 
 <div class="border-top pt-4 mb-4">
-    <h3 class="h6 fw-bold mb-3">Price</h3>
+    <h3 class="h6 fw-bold mb-3">Prix</h3>
     <div class="d-flex flex-column gap-2">
         <div class="form-check">
             <input class="form-check-input" type="radio" name="price" value="All" id="priceAll" 
                    [(ngModel)]="filters.price" (change)="onFilterChange()">
-            <label class="form-check-label" for="priceAll">All Prices</label>
+            <label class="form-check-label" for="priceAll">Tous les prix</label>
         </div>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="price" value="Free" id="priceFree" 
                    [(ngModel)]="filters.price" (change)="onFilterChange()">
-            <label class="form-check-label" for="priceFree">Free</label>
+            <label class="form-check-label" for="priceFree">Gratuit</label>
         </div>
         <div class="form-check">
             <input class="form-check-input" type="radio" name="price" value="Paid" id="pricePaid" 
                    [(ngModel)]="filters.price" (change)="onFilterChange()">
-            <label class="form-check-label" for="pricePaid">Paid</label>
+            <label class="form-check-label" for="pricePaid">Payant</label>
         </div>
     </div>
 </div>
@@ -78,6 +78,6 @@
     <button class="btn btn-light w-100 fw-bold text-dark border hover-bg-light" 
             style="background-color: #f8fafc;" 
             (click)="resetFilters()">
-        Reset Filters
+        Réinitialiser les filtres
     </button>
 </div>

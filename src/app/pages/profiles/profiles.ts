@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core'; // 1. Import ChangeDetectorRef
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { UserService, User } from '../../services/user';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router'; // Import Router
+import { RouterModule, Router } from '@angular/router';
 import { LucideAngularModule, User as UserIcon, Mail, Phone, Globe, GraduationCap, BookOpen, Briefcase, Award } from 'lucide-angular';
 
 @Component({
@@ -20,7 +20,10 @@ import { LucideAngularModule, User as UserIcon, Mail, Phone, Globe, GraduationCa
 export class Profiles implements OnInit {
 
   profileForm!: FormGroup;
-  user!: User;
+  
+  // 👇 CORRECTION 1 : On autorise le 'null' pour faire plaisir au compilateur
+  user: User | null = null; 
+  
   profileCompletion = 0;
   loading = true; // Commence à true
   isFirstCompletion = false;
@@ -39,24 +42,20 @@ export class Profiles implements OnInit {
     private fb: FormBuilder,
     private userService: UserService,
     private router: Router,
-    private cdr: ChangeDetectorRef // 2. Injection pour forcer l'affichage
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.initForm();
 
-    // S'abonner à l'utilisateur actuel
     this.userService.currentUser$.subscribe(user => {
-      console.log('Utilisateur détecté dans Profiles:', user); // DEBUG 1
-
       if (user && user.id) {
         this.user = user;
         this.loadProfile(user.id);
       } else {
-        // Si pas d'utilisateur, on arrête le chargement ou on redirige
-        console.warn('Aucun utilisateur connecté ou ID manquant');
+        console.warn('Utilisateur non connecté');
         this.loading = false;
-        // Optionnel : this.router.navigate(['/login']);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -82,7 +81,6 @@ export class Profiles implements OnInit {
         console.log('Données reçues:', res); // DEBUG 3
         
         const userData = res.user || res;
-  
         this.profileCompletion = userData.profileCompletion || 0;
         this.isFirstCompletion = this.profileCompletion < 100;
   
@@ -98,18 +96,19 @@ export class Profiles implements OnInit {
         });
   
         this.loading = false;
-        this.cdr.detectChanges(); // 3. FORCE LA MISE À JOUR DE L'ÉCRAN
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Erreur chargement profil', err);
         this.loading = false;
-        this.cdr.detectChanges(); // 4. FORCE LA MISE À JOUR MÊME EN ERREUR
+        this.cdr.detectChanges();
       }
     });
   }
   
   submit() {
-    if (this.profileForm.invalid) return;
+    // 👇 CORRECTION 2 : On vérifie que 'this.user' existe avant d'envoyer
+    if (this.profileForm.invalid || !this.user) return;
 
     const completion = this.calculateProfileCompletion();
     const payload = {
@@ -117,12 +116,12 @@ export class Profiles implements OnInit {
       profileCompletion: completion
     };
 
-    // On utilise userId ici
+    // Maintenant TypeScript est content car on a vérifié que user n'est pas null
     this.userService.updateProfile(this.user.id, payload).subscribe({
         next: (res) => {
             console.log('Profil mis à jour', res);
             this.profileCompletion = completion;
-            this.cdr.detectChanges(); // Force la mise à jour de la barre de progression
+            this.cdr.detectChanges();
         },
         error: (err) => console.error(err)
     });
@@ -135,7 +134,6 @@ export class Profiles implements OnInit {
       values.studyDomain, values.phone, values.destinationContinent,
       values.secondaryDomain
     ];
-    // On compte les champs remplis (non vides)
     const filled = fields.filter(v => v && v.toString().trim() !== '').length;
     return Math.round((filled / fields.length) * 100);
   }

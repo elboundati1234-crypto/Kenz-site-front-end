@@ -7,8 +7,8 @@
     
     <div class="d-flex flex-column gap-4 w-100 align-items-center position-relative" style="z-index: 1;">
         <div style="max-width: 720px;">
-            <h1 class="display-4 fw-bold">Find the perfect training</h1>
-            <p class="fs-5 opacity-75 fw-normal">Boost your career with certified courses and bootcamps.</p>
+            <h1 class="display-4 fw-bold">Trouvez la formation idéale</h1>
+            <p class="fs-5 opacity-75 fw-normal">Boostez votre carrière avec des cours certifiants et des bootcamps.</p>
         </div>
         
         <div class="w-100" style="max-width: 560px;">
@@ -17,10 +17,10 @@
                     <span class="material-symbols-outlined text-secondary">search</span>
                 </span>
                 <input type="text" class="form-control border-0 shadow-none" 
-                       placeholder="Search for Python, Marketing..." 
+                       placeholder="Rechercher Python, Marketing..." 
                        [(ngModel)]="searchTerm" 
                        (keyup.enter)="onSearch()">
-                <button class="btn btn-primary px-4 fw-bold border-0" (click)="onSearch()">Search</button>
+                <button class="btn btn-primary px-4 fw-bold border-0" (click)="onSearch()">Rechercher</button>
             </div>
         </div>
     </div>
@@ -30,8 +30,8 @@
     
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb mb-0 align-items-center small">
-            <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none text-secondary fw-medium hover-primary">Home</a></li>
-            <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Trainings</li>
+            <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none text-secondary fw-medium hover-primary">Accueil</a></li>
+            <li class="breadcrumb-item active text-dark fw-bold" aria-current="page">Formations</li>
         </ol>
     </nav>
 
@@ -48,19 +48,19 @@
             
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3 gap-3">
                 <div>
-                    <h2 class="h4 fw-bold mb-0">Available Trainings</h2>
-                    <p *ngIf="!isLoading" class="text-secondary small mb-0">Showing {{ filteredTrainings.length }} results</p>
+                    <h2 class="h4 fw-bold mb-0">Formations disponibles</h2>
+                    <p *ngIf="!isLoading" class="text-secondary small mb-0">Affichage de {{ filteredTrainings.length }} résultats</p>
                 </div>
 
                 <div class="d-flex align-items-center">
-                    <span class="text-secondary me-2 small fw-medium">Sort by:</span>
+                    <span class="text-secondary me-2 small fw-medium">Trier par :</span>
                     <select class="form-select form-select-sm border-0 bg-light fw-bold text-dark w-auto" 
                             style="min-width: 140px; cursor: pointer;"
                             [(ngModel)]="sortOption" 
                             (change)="onSortChange()">
-                        <option value="relevant">Most Relevant</option>
-                        <option value="newest">Newest</option>
-                        <option value="price_asc">Price: Low to High</option>
+                        <option value="relevant">Plus pertinents</option>
+                        <option value="newest">Plus récents</option>
+                        <option value="price_asc">Prix : Croissant</option>
                     </select>
                 </div>
             </div>
@@ -77,7 +77,7 @@
                 <button class="btn btn-link text-decoration-none p-0 ms-2 small fw-bold" 
                         style="font-size: 0.85rem;" 
                         (click)="handleReset()">
-                    Clear all
+                    Tout effacer
                 </button>
             </div>
 
@@ -85,13 +85,13 @@
                 <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="mt-3 text-secondary fw-medium">Searching trainings...</p>
+                <p class="mt-3 text-secondary fw-medium">Recherche de formations...</p>
             </div>
 
             <div *ngIf="!isLoading && filteredTrainings.length === 0" class="col-12 text-center py-5 bg-light rounded-4">
                 <span class="material-symbols-outlined fs-1 text-secondary mb-3">search_off</span>
-                <p class="text-secondary fw-medium">No trainings found matching your criteria.</p>
-                <button class="btn btn-outline-primary btn-sm mt-2" (click)="handleReset()">Clear Filters</button>
+                <p class="text-secondary fw-medium">Aucune formation trouvée correspondant à vos critères.</p>
+                <button class="btn btn-outline-primary btn-sm mt-2" (click)="handleReset()">Effacer les filtres</button>
             </div>
 
             <div *ngIf="!isLoading && filteredTrainings.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">

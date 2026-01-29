@@ -1,31 +1,31 @@
 <div class="bg-white p-4 rounded-4 border sticky-top" style="top: 100px; z-index: 1;">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h5 class="fw-bold mb-0">Filters</h5>
-        <a href="javascript:void(0)" (click)="triggerReset()" class="text-primary-custom text-decoration-none small fw-medium">Reset</a>
+        <h5 class="fw-bold mb-0">Filtres</h5>
+        <a href="javascript:void(0)" (click)="triggerReset()" class="text-primary-custom text-decoration-none small fw-medium">Réinitialiser</a>
     </div>
 
     <div class="mb-4">
-        <h6 class="fw-bold small mb-3">Field of Study</h6>
+        <h6 class="fw-bold small mb-3">Domaine d'étude</h6>
         <div class="d-flex flex-column gap-2">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" [(ngModel)]="filters.engineering" (change)="onFilterChange()" id="eng">
-                <label class="form-check-label small" for="eng">Engineering</label>
+                <label class="form-check-label small" for="eng">Ingénierie</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" [(ngModel)]="filters.medical" (change)="onFilterChange()" id="med">
-                <label class="form-check-label small" for="med">Medical & Health</label>
+                <label class="form-check-label small" for="med">Médecine & Santé</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" [(ngModel)]="filters.business" (change)="onFilterChange()" id="bus">
-                <label class="form-check-label small" for="bus">Business</label>
+                <label class="form-check-label small" for="bus">Commerce & Gestion</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" [(ngModel)]="filters.cs" (change)="onFilterChange()" id="cs">
-                <label class="form-check-label small" for="cs">Computer Science</label>
+                <label class="form-check-label small" for="cs">Informatique</label>
             </div>
              <div class="form-check">
                 <input class="form-check-input" type="checkbox" [(ngModel)]="filters.arts" (change)="onFilterChange()" id="arts">
-                <label class="form-check-label small" for="arts">Arts & Humanities</label>
+                <label class="form-check-label small" for="arts">Arts & Sciences Humaines</label>
             </div>
         </div>
     </div>
@@ -33,19 +33,19 @@
     <hr class="text-secondary opacity-25">
 
     <div class="mb-4">
-        <h6 class="fw-bold small mb-3">Academic Level</h6>
+        <h6 class="fw-bold small mb-3">Niveau académique</h6>
         <div class="d-flex flex-column gap-2">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" [(ngModel)]="filters.undergrad" (change)="onFilterChange()" id="und">
-                <label class="form-check-label small" for="und">Undergraduate</label>
+                <label class="form-check-label small" for="und">Licence (Bachelor)</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" [(ngModel)]="filters.masters" (change)="onFilterChange()" id="mas">
-                <label class="form-check-label small" for="mas">Master's Degree</label>
+                <label class="form-check-label small" for="mas">Master</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" [(ngModel)]="filters.phd" (change)="onFilterChange()" id="phd">
-                <label class="form-check-label small" for="phd">PhD / Doctorate</label>
+                <label class="form-check-label small" for="phd">Doctorat (PhD)</label>
             </div>
         </div>
     </div>
@@ -53,7 +53,7 @@
     <hr class="text-secondary opacity-25">
     
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <span class="fw-bold small">Closing Soon</span>
+        <span class="fw-bold small">Expire bientôt</span>
         <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" role="switch" [(ngModel)]="filters.closingSoon" (change)="onFilterChange()">
         </div>
@@ -62,16 +62,16 @@
     <hr class="text-secondary opacity-25">
 
     <div class="mb-2">
-        <label class="fw-bold small mb-2">Location</label>
+        <label class="fw-bold small mb-2">Lieu</label>
         <select class="form-select text-secondary bg-light" [(ngModel)]="filters.location" (change)="onFilterChange()">
-            <option value="Any Location">Any Location</option>
-            <option value="United Kingdom">United Kingdom</option>
-            <option value="USA">United States</option>
+            <option value="Any Location">Tous les lieux</option>
+            <option value="United Kingdom">Royaume-Uni</option>
+            <option value="USA">États-Unis</option>
             <option value="Canada">Canada</option>
-            <option value="Australia">Australia</option>
+            <option value="Australia">Australie</option>
             <option value="France">France</option>
-            <option value="Germany">Germany</option>
-            <option value="Morocco">Morocco</option>
+            <option value="Germany">Allemagne</option>
+            <option value="Morocco">Maroc</option>
         </select>
     </div>
 </div>

@@ -2,8 +2,8 @@
   <div style="max-width: 420px; width: 100%;">
     
     <div class="text-center mb-5">
-      <h1 class="h2 fw-bold text-dark mb-2">Kenz</h1>
-      <p class="text-secondary">Log in to your account</p>
+      <h1 class="h2 fw-bold text-dark mb-2">ScholarHub</h1>
+      <p class="text-secondary">Connectez-vous à votre compte</p>
     </div>
 
     <div class="bg-white rounded-3 shadow-sm p-5">
@@ -27,18 +27,18 @@
               formControlName="email"
               class="form-control border-0 bg-light shadow-none py-2"
               [class.is-invalid]="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)"
-              placeholder="your@email.com"
+              placeholder="votre@email.com"
             />
           </div>
           <div *ngIf="loginForm.get('email')?.invalid && (loginForm.get('email')?.dirty || loginForm.get('email')?.touched)" 
                class="mt-1 text-danger small ps-1">
-            <span *ngIf="loginForm.get('email')?.hasError('required')">Email is required.</span>
-            <span *ngIf="loginForm.get('email')?.hasError('email')">Invalid email format.</span>
+            <span *ngIf="loginForm.get('email')?.hasError('required')">L'email est requis.</span>
+            <span *ngIf="loginForm.get('email')?.hasError('email')">Format d'email invalide.</span>
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="password" class="form-label fw-500 small text-secondary mb-1">Password</label>
+          <label for="password" class="form-label fw-500 small text-secondary mb-1">Mot de passe</label>
           <div class="input-group">
             <span class="input-group-text border-0 bg-light ps-3 pe-2">
               <lucide-angular [img]="LockIcon" class="text-secondary" size="18"></lucide-angular>
@@ -62,13 +62,13 @@
           </div>
           <div *ngIf="loginForm.get('password')?.invalid && (loginForm.get('password')?.dirty || loginForm.get('password')?.touched)" 
                class="mt-1 text-danger small ps-1">
-            Password is required.
+            Le mot de passe est requis.
           </div>
         </div>
 
         <div class="d-flex justify-content-end mb-4">
           <a routerLink="/forgot-password" class="text-primary text-decoration-none small fw-500 hover-underline">
-            Forgot password?
+            Mot de passe oublié ?
           </a>
         </div>
 
@@ -79,14 +79,14 @@
           style="background-color: var(--primary-custom); border: none;"
         >
           <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-          {{ loading ? 'Logging in...' : 'Log in' }}
+          {{ loading ? 'Connexion en cours...' : 'Se connecter' }}
         </button>
       </form>
 
       <div class="mb-4 position-relative text-center">
         <hr class="text-secondary opacity-25">
         <span class="bg-white px-2 text-secondary small position-absolute top-50 start-50 translate-middle">
-          Or continue with
+          Ou continuez avec
         </span>
       </div>
 
@@ -123,9 +123,9 @@
 
       <div class="text-center">
         <p class="text-secondary small mb-0">
-          Don't have an account?
+          Vous n'avez pas de compte ?
           <a routerLink="/register" class="text-primary text-decoration-none fw-bold hover-underline">
-            Sign up
+            Inscrivez-vous
           </a>
         </p>
       </div>

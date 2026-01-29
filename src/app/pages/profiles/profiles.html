@@ -1,183 +1,183 @@
 <div class="min-vh-100 bg-light py-5">
     
-  <div *ngIf="loading" class="d-flex flex-column align-items-center justify-content-center" style="min-height: 50vh;">
-      <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
-          <span class="visually-hidden">Loading...</span>
-      </div>
-      <p class="text-secondary fw-medium">Chargement de votre profil...</p>
-  </div>
+    <div *ngIf="loading" class="d-flex flex-column align-items-center justify-content-center" style="min-height: 50vh;">
+        <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-secondary fw-medium">Chargement de votre profil...</p>
+    </div>
 
-  <div class="container" *ngIf="!loading" style="max-width: 850px;">
-      
-      <div class="text-center mb-5">
-          <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary shadow-sm rounded-circle mb-3" style="width: 80px; height: 80px;">
-              <span *ngIf="!user?.photoUrl" class="fs-2 fw-bold">{{ user?.initials }}</span>
-              <img *ngIf="user?.photoUrl" [src]="user?.photoUrl" class="w-100 h-100 rounded-circle object-fit-cover">
-          </div>
-          <h2 class="fw-bold text-dark">Mon Profil</h2>
-          <p class="text-secondary">Gérez vos informations et complétez votre dossier.</p>
-      </div>
+    <div class="container" *ngIf="!loading" style="max-width: 850px;">
+        
+        <div class="text-center mb-5">
+            <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary shadow-sm rounded-circle mb-3" style="width: 80px; height: 80px;">
+                <span *ngIf="!user?.photoUrl" class="fs-2 fw-bold">{{ user?.initials }}</span>
+                <img *ngIf="user?.photoUrl" [src]="user?.photoUrl" class="w-100 h-100 rounded-circle object-fit-cover">
+            </div>
+            <h2 class="fw-bold text-dark">Mon Profil</h2>
+            <p class="text-secondary">Gérez vos informations et complétez votre dossier.</p>
+        </div>
 
-      <div class="row g-4">
-          
-          <div class="col-lg-4">
-              <div class="card border-0 shadow-sm rounded-4 h-100">
-                  <div class="card-body p-4 text-center">
-                      <h5 class="fw-bold mb-4">Complétion</h5>
-                      
-                      <div class="position-relative d-inline-flex align-items-center justify-content-center mb-3">
-                          <div class="display-4 fw-bold" [class.text-success]="profileCompletion === 100" [class.text-primary]="profileCompletion < 100">
-                              {{ profileCompletion }}%
-                          </div>
-                      </div>
+        <div class="row g-4">
+            
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-body p-4 text-center">
+                        <h5 class="fw-bold mb-4">Complétion</h5>
+                        
+                        <div class="position-relative d-inline-flex align-items-center justify-content-center mb-3">
+                            <div class="display-4 fw-bold" [class.text-success]="profileCompletion === 100" [class.text-primary]="profileCompletion < 100">
+                                {{ profileCompletion }}%
+                            </div>
+                        </div>
 
-                      <div class="progress mb-3" style="height: 10px;">
-                          <div class="progress-bar rounded-pill" 
-                               role="progressbar" 
-                               [style.width.%]="profileCompletion"
-                               [class.bg-success]="profileCompletion === 100"
-                               [class.bg-primary]="profileCompletion < 100">
-                          </div>
-                      </div>
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar rounded-pill" 
+                                 role="progressbar" 
+                                 [style.width.%]="profileCompletion"
+                                 [class.bg-success]="profileCompletion === 100"
+                                 [class.bg-primary]="profileCompletion < 100">
+                            </div>
+                        </div>
 
-                      <p class="small text-secondary mb-0">
-                          {{ profileCompletion === 100 ? 'Profil complet ! 🎉' : 'Complétez tous les champs pour maximiser vos chances.' }}
-                      </p>
-                  </div>
-              </div>
-          </div>
+                        <p class="small text-secondary mb-0">
+                            {{ profileCompletion === 100 ? 'Profil complet ! 🎉' : 'Complétez tous les champs pour maximiser vos chances.' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
 
-          <div class="col-lg-8">
-              <div class="card border-0 shadow-sm rounded-4">
-                  <div class="card-body p-4 p-md-5">
-                      
-                      <form [formGroup]="profileForm" (ngSubmit)="submit()">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body p-4 p-md-5">
+                        
+                        <form [formGroup]="profileForm" (ngSubmit)="submit()">
 
-                          <h6 class="fw-bold text-uppercase text-secondary small mb-3 ls-1">Informations Personnelles</h6>
-                          
-                          <div class="row g-3 mb-4">
-                              <div class="col-md-6">
-                                  <label class="form-label fw-medium small mb-1">Prénom</label>
-                                  <div class="input-group">
-                                      <span class="input-group-text border-0 bg-light text-secondary ps-3">
-                                          <lucide-angular [img]="UserIcon" size="18"></lucide-angular>
-                                      </span>
-                                      <input type="text" class="form-control border-0 bg-light py-2 shadow-none" formControlName="firstName" placeholder="Votre prénom">
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <label class="form-label fw-medium small mb-1">Nom</label>
-                                  <div class="input-group">
-                                      <span class="input-group-text border-0 bg-light text-secondary ps-3">
-                                          <lucide-angular [img]="UserIcon" size="18"></lucide-angular>
-                                      </span>
-                                      <input type="text" class="form-control border-0 bg-light py-2 shadow-none" formControlName="lastName" placeholder="Votre nom">
-                                  </div>
-                              </div>
-                              <div class="col-12">
-                                  <label class="form-label fw-medium small mb-1">Email</label>
-                                  <div class="input-group">
-                                      <span class="input-group-text border-0 bg-light text-secondary ps-3">
-                                          <lucide-angular [img]="MailIcon" size="18"></lucide-angular>
-                                      </span>
-                                      <input type="email" class="form-control border-0 bg-light py-2 shadow-none text-muted" formControlName="email">
-                                      <span class="input-group-text border-0 bg-light text-muted small">
-                                          <span class="material-symbols-outlined fs-6">lock</span>
-                                      </span>
-                                  </div>
-                              </div>
-                              <div class="col-12">
-                                  <label class="form-label fw-medium small mb-1">Téléphone</label>
-                                  <div class="input-group">
-                                      <span class="input-group-text border-0 bg-light text-secondary ps-3">
-                                          <lucide-angular [img]="PhoneIcon" size="18"></lucide-angular>
-                                      </span>
-                                      <input type="text" class="form-control border-0 bg-light py-2 shadow-none" formControlName="phone" placeholder="+212 6...">
-                                  </div>
-                              </div>
-                          </div>
+                            <h6 class="fw-bold text-uppercase text-secondary small mb-3 ls-1">Informations Personnelles</h6>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium small mb-1">Prénom</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text border-0 bg-light text-secondary ps-3">
+                                            <lucide-angular [img]="UserIcon" size="18"></lucide-angular>
+                                        </span>
+                                        <input type="text" class="form-control border-0 bg-light py-2 shadow-none" formControlName="firstName" placeholder="Votre prénom">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium small mb-1">Nom</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text border-0 bg-light text-secondary ps-3">
+                                            <lucide-angular [img]="UserIcon" size="18"></lucide-angular>
+                                        </span>
+                                        <input type="text" class="form-control border-0 bg-light py-2 shadow-none" formControlName="lastName" placeholder="Votre nom">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-medium small mb-1">Email</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text border-0 bg-light text-secondary ps-3">
+                                            <lucide-angular [img]="MailIcon" size="18"></lucide-angular>
+                                        </span>
+                                        <input type="email" class="form-control border-0 bg-light py-2 shadow-none text-muted" formControlName="email">
+                                        <span class="input-group-text border-0 bg-light text-muted small">
+                                            <span class="material-symbols-outlined fs-6">lock</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-medium small mb-1">Téléphone</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text border-0 bg-light text-secondary ps-3">
+                                            <lucide-angular [img]="PhoneIcon" size="18"></lucide-angular>
+                                        </span>
+                                        <input type="text" class="form-control border-0 bg-light py-2 shadow-none" formControlName="phone" placeholder="+212 6...">
+                                    </div>
+                                </div>
+                            </div>
 
-                          <hr class="border-secondary opacity-10 my-4">
+                            <hr class="border-secondary opacity-10 my-4">
 
-                          <h6 class="fw-bold text-uppercase text-secondary small mb-3 ls-1">Parcours Académique</h6>
+                            <h6 class="fw-bold text-uppercase text-secondary small mb-3 ls-1">Parcours Académique</h6>
 
-                          <div class="row g-3 mb-4">
-                              <div class="col-md-6">
-                                  <label class="form-label fw-medium small mb-1">Niveau d'étude</label>
-                                  <div class="input-group">
-                                      <span class="input-group-text border-0 bg-light text-secondary ps-3">
-                                          <lucide-angular [img]="GradIcon" size="18"></lucide-angular>
-                                      </span>
-                                      <select class="form-select border-0 bg-light py-2 shadow-none" formControlName="educationLevel">
-                                          <option value="">Sélectionner...</option>
-                                          <option value="Licence">Licence (Bachelor)</option>
-                                          <option value="Master">Master</option>
-                                          <option value="Doctorat">Doctorat</option>
-                                      </select>
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <label class="form-label fw-medium small mb-1">Domaine d'étude</label>
-                                  <div class="input-group">
-                                      <span class="input-group-text border-0 bg-light text-secondary ps-3">
-                                          <lucide-angular [img]="BookIcon" size="18"></lucide-angular>
-                                      </span>
-                                      <select class="form-select border-0 bg-light py-2 shadow-none" formControlName="studyDomain">
-                                          <option value="">Sélectionner...</option>
-                                          <option value="Informatique">Informatique</option>
-                                          <option value="Droit">Droit</option>
-                                          <option value="Médecine">Médecine</option>
-                                          <option value="Économie">Économie</option>
-                                          <option value="Ingénierie">Ingénierie</option>
-                                          <option value="Sciences Humaines">Sciences Humaines</option>
-                                      </select>
-                                  </div>
-                              </div>
-                          </div>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium small mb-1">Niveau d'étude</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text border-0 bg-light text-secondary ps-3">
+                                            <lucide-angular [img]="GradIcon" size="18"></lucide-angular>
+                                        </span>
+                                        <select class="form-select border-0 bg-light py-2 shadow-none" formControlName="educationLevel">
+                                            <option value="">Sélectionner...</option>
+                                            <option value="Licence">Licence (Bachelor)</option>
+                                            <option value="Master">Master</option>
+                                            <option value="Doctorat">Doctorat</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium small mb-1">Domaine d'étude</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text border-0 bg-light text-secondary ps-3">
+                                            <lucide-angular [img]="BookIcon" size="18"></lucide-angular>
+                                        </span>
+                                        <select class="form-select border-0 bg-light py-2 shadow-none" formControlName="studyDomain">
+                                            <option value="">Sélectionner...</option>
+                                            <option value="Informatique">Informatique</option>
+                                            <option value="Droit">Droit</option>
+                                            <option value="Médecine">Médecine</option>
+                                            <option value="Économie">Économie</option>
+                                            <option value="Ingénierie">Ingénierie</option>
+                                            <option value="Sciences Humaines">Sciences Humaines</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
 
-                          <hr class="border-secondary opacity-10 my-4">
+                            <hr class="border-secondary opacity-10 my-4">
 
-                          <h6 class="fw-bold text-uppercase text-secondary small mb-3 ls-1">Objectifs & Préférences</h6>
+                            <h6 class="fw-bold text-uppercase text-secondary small mb-3 ls-1">Objectifs & Préférences</h6>
 
-                          <div class="row g-3 mb-4">
-                              <div class="col-md-6">
-                                  <label class="form-label fw-medium small mb-1">Continent visé</label>
-                                  <div class="input-group">
-                                      <span class="input-group-text border-0 bg-light text-secondary ps-3">
-                                          <lucide-angular [img]="GlobeIcon" size="18"></lucide-angular>
-                                      </span>
-                                      <input type="text" class="form-control border-0 bg-light py-2 shadow-none" formControlName="destinationContinent" placeholder="Ex: Europe">
-                                  </div>
-                              </div>
-                              <div class="col-md-6">
-                                  <label class="form-label fw-medium small mb-1">Domaine Secondaire</label>
-                                  <div class="input-group">
-                                      <span class="input-group-text border-0 bg-light text-secondary ps-3">
-                                          <lucide-angular [img]="BriefcaseIcon" size="18"></lucide-angular>
-                                      </span>
-                                      <select class="form-select border-0 bg-light py-2 shadow-none" formControlName="secondaryDomain">
-                                          <option value="">Sélectionner...</option>
-                                          <option value="Informatique">Informatique</option>
-                                          <option value="Droit">Droit</option>
-                                          <option value="Économie">Économie</option>
-                                          </select>
-                                  </div>
-                              </div>
-                          </div>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium small mb-1">Continent visé</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text border-0 bg-light text-secondary ps-3">
+                                            <lucide-angular [img]="GlobeIcon" size="18"></lucide-angular>
+                                        </span>
+                                        <input type="text" class="form-control border-0 bg-light py-2 shadow-none" formControlName="destinationContinent" placeholder="Ex: Europe">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium small mb-1">Domaine Secondaire</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text border-0 bg-light text-secondary ps-3">
+                                            <lucide-angular [img]="BriefcaseIcon" size="18"></lucide-angular>
+                                        </span>
+                                        <select class="form-select border-0 bg-light py-2 shadow-none" formControlName="secondaryDomain">
+                                            <option value="">Sélectionner...</option>
+                                            <option value="Informatique">Informatique</option>
+                                            <option value="Droit">Droit</option>
+                                            <option value="Économie">Économie</option>
+                                            </select>
+                                    </div>
+                                </div>
+                            </div>
 
-                          <button type="submit" 
-                                  class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2"
-                                  style="background-color: var(--primary-custom); border: none;">
-                              <lucide-angular [img]="AwardIcon" size="20"></lucide-angular>
-                              {{ isFirstCompletion ? 'Finaliser mon Profil' : 'Mettre à jour' }}
-                          </button>
+                            <button type="submit" 
+                                    class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2"
+                                    style="background-color: var(--primary-custom); border: none;">
+                                <lucide-angular [img]="AwardIcon" size="20"></lucide-angular>
+                                {{ isFirstCompletion ? 'Finaliser mon Profil' : 'Mettre à jour' }}
+                            </button>
 
-                      </form>
+                        </form>
 
-                  </div>
-              </div>
-          </div>
+                    </div>
+                </div>
+            </div>
 
-      </div>
-  </div>
+        </div>
+    </div>
 </div>
