@@ -1,0 +1,137 @@
+<div class="min-vh-100 bg-light">
+    
+    <div class="bg-white border-bottom py-5 mb-5">
+        <div class="container text-center" style="max-width: 800px;">
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-4" 
+                 style="width: 80px; height: 80px;">
+                <lucide-angular [img]="BookIcon" size="40" class="text-primary-custom"></lucide-angular>
+            </div>
+            <h1 class="display-5 fw-bold text-dark mb-3">Empowering Academic Futures</h1>
+            <p class="fs-5 text-secondary">
+                Kenz est la plateforme qui connecte les étudiants ambitieux aux meilleures opportunités académiques mondiales.
+            </p>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        
+        <div class="row align-items-center mb-5 g-5">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm p-4 h-100 rounded-4">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <div class="bg-light p-3 rounded-circle text-primary-custom">
+                                <lucide-angular [img]="TargetIcon" size="28"></lucide-angular>
+                            </div>
+                            <h2 class="h3 fw-bold mb-0">Notre Mission</h2>
+                        </div>
+                        <p class="text-secondary leading-relaxed mb-4">
+                            Nous croyons que l'éducation ne devrait avoir aucune frontière. Notre mission est de simplifier l'accès aux bourses, aux formations et aux événements académiques pour les étudiants du monde entier.
+                        </p>
+                        <p class="text-secondary leading-relaxed mb-0">
+                            Que vous cherchiez un doctorat en Europe, un stage en Asie ou une conférence en ligne, Kenz centralise tout pour vous permettre de vous concentrer sur ce qui compte vraiment : <strong>votre réussite</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="card border-0 shadow-sm p-4 text-center rounded-4 h-100 bg-primary-custom text-white">
+                            <h3 class="display-4 fw-bold mb-1">500+</h3>
+                            <p class="mb-0 opacity-75">Opportunités</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-0 shadow-sm p-4 text-center rounded-4 h-100 bg-white">
+                            <h3 class="display-4 fw-bold text-dark mb-1">50+</h3>
+                            <p class="text-secondary mb-0">Pays Partenaires</p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm p-4 rounded-4 bg-white d-flex flex-row align-items-center gap-4">
+                            <div class="bg-success-subtle p-3 rounded-circle text-success">
+                                <lucide-angular [img]="UsersIcon" size="32"></lucide-angular>
+                            </div>
+                            <div>
+                                <h4 class="fw-bold mb-1">Communauté Grandissante</h4>
+                                <p class="text-secondary mb-0 small">Rejoignez des milliers d'étudiants passionnés.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold text-dark">Pourquoi choisir Kenz ?</h2>
+                <p class="text-secondary">Des outils conçus pour votre parcours.</p>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm p-4 rounded-4 transition-hover text-center">
+                        <div class="mx-auto bg-light p-3 rounded-circle mb-3 text-primary-custom" style="width: fit-content;">
+                            <lucide-angular [img]="GlobeIcon" size="32"></lucide-angular>
+                        </div>
+                        <h5 class="fw-bold mb-3">Accès Global</h5>
+                        <p class="text-secondary small mb-0">
+                            Explorez des opportunités dans les universités les plus prestigieuses à travers le monde, filtrées selon vos critères.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm p-4 rounded-4 transition-hover text-center">
+                        <div class="mx-auto bg-light p-3 rounded-circle mb-3 text-primary-custom" style="width: fit-content;">
+                            <lucide-angular [img]="AwardIcon" size="32"></lucide-angular>
+                        </div>
+                        <h5 class="fw-bold mb-3">Excellence Vérifiée</h5>
+                        <p class="text-secondary small mb-0">
+                            Toutes les bourses et événements sont vérifiés manuellement pour garantir leur authenticité et leur qualité.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm p-4 rounded-4 transition-hover text-center">
+                        <div class="mx-auto bg-light p-3 rounded-circle mb-3 text-primary-custom" style="width: fit-content;">
+                            <lucide-angular [img]="RocketIcon" size="32"></lucide-angular>
+                        </div>
+                        <h5 class="fw-bold mb-3">Boost de Carrière</h5>
+                        <p class="text-secondary small mb-0">
+                            Développez votre réseau et vos compétences grâce à des stages et des formations exclusifs.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="!isLoggedIn" class="bg-white rounded-4 shadow-sm p-5 text-center mt-5 position-relative overflow-hidden">
+            <div class="position-relative z-1">
+                <h2 class="fw-bold mb-3">Prêt à lancer votre carrière ?</h2>
+                <p class="text-secondary mb-4" style="max-width: 600px; margin: 0 auto;">
+                    Créez votre compte gratuitement dès aujourd'hui et commencez à postuler aux meilleures opportunités.
+                </p>
+                <a routerLink="/register" class="btn btn-primary px-5 py-3 fw-bold rounded-pill shadow-sm" style="background-color: var(--primary-custom); border: none;">
+                    Rejoindre Kenz
+                </a>
+            </div>
+        </div>
+
+        <div *ngIf="isLoggedIn" class="bg-primary-custom text-white rounded-4 shadow-sm p-5 text-center mt-5 position-relative overflow-hidden">
+            <div class="position-relative z-1">
+                <h2 class="fw-bold mb-3">Ravi de vous revoir !</h2>
+                <p class="opacity-75 mb-4 fs-5" style="max-width: 600px; margin: 0 auto;">
+                    De nouvelles bourses et formations ont été ajoutées. Ne manquez pas votre chance.
+                </p>
+                <a routerLink="/scholarships" class="btn btn-light text-primary px-5 py-3 fw-bold rounded-pill shadow-sm border-0">
+                    Explorer les opportunités
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>

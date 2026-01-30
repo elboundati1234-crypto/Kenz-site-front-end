@@ -1,0 +1,36 @@
+/* Réutilisation de votre variable couleur */
+:host {
+    --primary-custom: #0d6efd; /* Ou votre bleu spécifique */
+}
+
+.text-primary-custom {
+    color: var(--primary-custom) !important;
+}
+
+.bg-primary-custom {
+    background-color: var(--primary-custom) !important;
+}
+
+/* Espacement du texte */
+.leading-relaxed {
+    line-height: 1.7;
+}
+
+/* Effet de survol sur les cartes "Features" */
+.transition-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.transition-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+}
+
+/* Fond subtil pour les icônes */
+.bg-primary-subtle {
+    background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+.bg-success-subtle {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+}

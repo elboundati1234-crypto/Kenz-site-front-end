@@ -7,6 +7,7 @@ import { ScholarshipsComponent } from './pages/scholarships/scholarships';
 import { ScholarshipDetailsComponent } from './pages/scholarship-details/scholarship-details';
 import { TrainingsComponent } from './pages/trainings/trainings';
 import { Profiles } from './pages/profiles/profiles';
+import { AboutComponent } from './pages/about/about';
 
 export const routes: Routes = [
   // Home
@@ -48,6 +49,12 @@ export const routes: Routes = [
   {
     path: 'details/:id',
     component: ScholarshipDetailsComponent,
+    runGuardsAndResolvers: 'always'
+  },
+  
+  {
+    path: 'about',
+    component: AboutComponent,
     runGuardsAndResolvers: 'always'
   },
 
