@@ -8,6 +8,7 @@ import { ScholarshipDetailsComponent } from './pages/scholarship-details/scholar
 import { TrainingsComponent } from './pages/trainings/trainings';
 import { Profiles } from './pages/profiles/profiles';
 import { AboutComponent } from './pages/about/about';
+import { NotFoundComponent } from './pages/not-found/not-found';
 
 export const routes: Routes = [
   // Home
@@ -52,5 +53,7 @@ export const routes: Routes = [
     component: AboutComponent
   },
 
-  { path: '**', redirectTo: 'home' }
+  { path: '**', 
+    component: NotFoundComponent,
+    title: 'Page introuvable - Kenz'  }
 ];

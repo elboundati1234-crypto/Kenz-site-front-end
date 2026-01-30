@@ -1,0 +1,44 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light py-5">
+    <div class="container text-center">
+        
+        <div class="mb-4 position-relative d-inline-block">
+            <div class="bg-white p-4 rounded-circle shadow-sm" style="width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                <lucide-angular [img]="FileQuestionIcon" size="64" class="text-secondary opacity-50"></lucide-angular>
+            </div>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger shadow-sm border border-white p-2">
+                <span class="visually-hidden">Erreur</span>
+                <span style="font-size: 1.5rem;">?</span>
+            </span>
+        </div>
+
+        <h1 class="error-code mb-2">404</h1>
+
+        <h2 class="h2 fw-bold text-dark mb-3">Oups ! Page introuvable.</h2>
+        <p class="text-secondary fs-5 mb-5 mx-auto" style="max-width: 500px;">
+            Désolé, la page que vous recherchez semble avoir été déplacée, supprimée ou n'a jamais existé.
+        </p>
+
+        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center align-items-center">
+            
+            <button (click)="goBack()" class="btn btn-white border px-4 py-3 rounded-pill fw-bold d-flex align-items-center gap-2 hover-bg-light transition-all shadow-sm">
+                <lucide-angular [img]="ArrowLeftIcon" size="20"></lucide-angular>
+                Retour
+            </button>
+
+            <a routerLink="/" class="btn btn-primary px-4 py-3 rounded-pill fw-bold d-flex align-items-center gap-2 shadow transition-all" 
+               style="background-color: var(--primary-custom); border: none;">
+                <lucide-angular [img]="HomeIcon" size="20"></lucide-angular>
+                Aller à l'accueil
+            </a>
+
+        </div>
+
+        <div class="mt-5 pt-4 border-top w-50 mx-auto">
+            <p class="small text-secondary mb-0">
+                Vous pensez qu'il s'agit d'une erreur ? 
+                <a routerLink="/contact" class="text-primary-custom text-decoration-none fw-bold">Contactez le support</a>.
+            </p>
+        </div>
+
+    </div>
+</div>
