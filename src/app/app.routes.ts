@@ -14,8 +14,7 @@ export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
     path: 'home',
-    component: HomeComponent,
-    runGuardsAndResolvers: 'always'
+    component: HomeComponent
   },
 
   // Auth
@@ -27,35 +26,30 @@ export const routes: Routes = [
   // Scholarships
   {
     path: 'scholarships',
-    component: ScholarshipsComponent,
-    runGuardsAndResolvers: 'always'
+    component: ScholarshipsComponent
   },
 
   // Trainings
   {
     path: 'trainings',
-    component: TrainingsComponent,
-    runGuardsAndResolvers: 'always'
+    component: TrainingsComponent
   },
 
   // Events
   {
     path: 'events',
-    component: EventsComponent,
-    runGuardsAndResolvers: 'always'
+    component: EventsComponent
   },
 
   // Details 
   {
     path: 'details/:id',
-    component: ScholarshipDetailsComponent,
-    runGuardsAndResolvers: 'always'
+    component: ScholarshipDetailsComponent
   },
   
   {
     path: 'about',
-    component: AboutComponent,
-    runGuardsAndResolvers: 'always'
+    component: AboutComponent
   },
 
   { path: '**', redirectTo: 'home' }

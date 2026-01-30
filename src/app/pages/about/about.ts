@@ -1,7 +1,7 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core'; // 1. Importer ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { UserService } from '../../services/user'; // Vérifiez le chemin
+import { UserService } from '../../services/user'; 
 import { LucideAngularModule, Target, Users, Globe, Award, BookOpen, Rocket } from 'lucide-angular';
 
 @Component({
@@ -14,6 +14,8 @@ import { LucideAngularModule, Target, Users, Globe, Award, BookOpen, Rocket } fr
 export class AboutComponent implements OnInit {
   
   private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef); // 2. Injecter le détecteur de changement
+  
   isLoggedIn = false;
 
   // Icônes
@@ -25,9 +27,11 @@ export class AboutComponent implements OnInit {
   readonly RocketIcon = Rocket;
 
   ngOnInit() {
-    // Vérifier si l'utilisateur est connecté
+    // S'abonner aux changements d'état de l'utilisateur
     this.userService.currentUser$.subscribe(user => {
-      this.isLoggedIn = !!user; // true si utilisateur existe, false sinon
+      this.isLoggedIn = !!user; // true si connecté, false sinon
+      
+      this.cdr.detectChanges(); // 3. FORCER LE RAFRAÎCHISSEMENT DE LA VUE
     });
   }
 }
